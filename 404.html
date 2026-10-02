@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 // Coordinate Not Found | InternWell SLIET</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <style>
+    .error-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+      position: relative;
+      z-index: 10;
+    }
+    .error-code {
+      font-size: clamp(6rem, 15vw, 12rem);
+      font-weight: 800;
+      line-height: 1;
+      background: var(--cyber-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="cyber-grid-overlay"></div>
+  <div class="scanlines"></div>
+
+  <div class="error-container">
+    <div class="section-tag">
+      <span class="dot" style="background:#ff5f56; box-shadow: 0 0 10px #ff5f56;"></span>
+      <span>ERROR: SEC_FAULT_404</span>
+    </div>
+    <div class="error-code">404</div>
+    <h2 style="font-size: 2rem; margin-bottom: 16px;">SECTOR NOT FOUND IN SLIET MATRIX</h2>
+    <p style="color: var(--text-secondary); max-width: 500px; margin-bottom: 32px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;">
+      The requested cyber node does not exist or has been relocated to another neural pathway.
+    </p>
+    <a href="./index.html" class="btn-cyber-primary">
+      Return to Neural Gateway
+    </a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "internwell-sliet-web",
+  "version": "2.4.0",
+  "description": "3D Animated Technical Website for InternWell SLIET - College Tech & Career Accelerator Cell",
+  "scripts": {
+    "start": "npx -y serve .",
+    "dev": "npx -y serve .",
+    "preview": "python3 -m http.server 3000"
+  },
+  "keywords": [
+    "internwell",
+    "sliet",
+    "threejs",
+    "3d-animation",
+    "technical-club",
+    "github-pages"
+  ],
+  "author": "InternWell SLIET",
+  "license": "MIT"
+}
