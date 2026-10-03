@@ -136,7 +136,7 @@ button {
   opacity: 0.6;
 }
 
-/* 3D WebGL Canvas Layer */
+/* 3D WebGL Canvas Layer - Prominent in Hero, Automatically Fades on Scroll */
 #webgl-canvas-container {
   position: fixed;
   top: 0;
@@ -146,6 +146,8 @@ button {
   z-index: 0;
   pointer-events: none;
   opacity: 1;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity;
 }
 
 /* Ambient Subtle Lighting Orbs */
@@ -189,6 +191,11 @@ section {
   position: relative;
   padding: 100px 0;
   z-index: 2;
+}
+
+/* Content sections have solid backdrops so background 3D canvas never affects text readability */
+#about, #motive, #domains, #events, #projects, #team, #faq {
+  background-color: var(--bg-deep);
 }
 
 .section-tag {
@@ -491,6 +498,7 @@ section {
 }
 
 .hero-content {
+  order: 1;
   position: relative;
   z-index: 3;
 }
@@ -546,13 +554,24 @@ section {
   margin-bottom: 44px;
 }
 
-/* 3D Visual Stage in Hero (Clean without cluttered buttons) */
+/* 3D Visual Stage in Hero - Contained, Dedicated Box for 3D Logo */
 .hero-visual-stage {
+  order: 2;
   position: relative;
-  height: 480px;
+  height: 460px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.hero-visual-stage canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: auto;
 }
 
 /* Hero Stats Bar */
@@ -1395,23 +1414,38 @@ section {
   color: var(--text-muted);
 }
 
+/* Desktop mobile menu CTA hidden by default */
+.mobile-menu-cta {
+  display: none;
+}
+
 /* ==========================================================================
-   RESPONSIVENESS (BOTH DESKTOP AND WITHOUT DESKTOP / MOBILE)
+   RESPONSIVENESS (BOTH DESKTOP AND WITHOUT DESKTOP / MOBILE VIEW)
    ========================================================================== */
 @media (max-width: 1024px) {
   .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
+    gap: 16px;
+  }
+  .hero-visual-stage {
+    order: 1;
+    width: 100%;
+    max-width: 280px;
+    height: 230px;
+    margin: 0 auto;
+  }
+  .hero-content {
+    order: 2;
+    width: 100%;
   }
   .hero-tagline {
-    margin: 0 auto 30px;
+    margin: 0 auto 26px;
   }
   .hero-buttons {
     justify-content: center;
-  }
-  .hero-visual-stage {
-    height: 380px;
   }
   .domains-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1429,6 +1463,31 @@ section {
   .navbar-container {
     padding: 0 16px;
   }
+  /* Keep brand compact on mobile so top bar never overflows */
+  .brand-subtext {
+    display: none;
+  }
+  .brand-name {
+    font-size: 1.05rem;
+  }
+  .brand-logo-img {
+    width: 36px;
+    height: 36px;
+  }
+  #sound-status-text {
+    display: none;
+  }
+  .sound-toggle-btn {
+    padding: 8px 10px;
+  }
+  /* Hide top desktop join button on mobile to prevent navbar overflow */
+  .nav-desktop-join-btn {
+    display: none;
+  }
+  .mobile-menu-cta {
+    display: block;
+  }
+
   .nav-menu {
     position: fixed;
     top: var(--nav-height);
@@ -1439,7 +1498,7 @@ section {
     backdrop-filter: blur(20px);
     flex-direction: column;
     justify-content: center;
-    gap: 22px;
+    gap: 20px;
     transition: left var(--transition-smooth);
     padding: 24px;
   }
@@ -1449,22 +1508,81 @@ section {
   .mobile-nav-toggle {
     display: flex;
   }
+
+  /* Hero Section Mobile Optimization: ZERO OVERLAP */
+  .hero-section {
+    padding-top: calc(var(--nav-height) + 10px);
+    padding-bottom: 40px;
+    min-height: auto;
+  }
+  .hero-visual-stage {
+    height: 220px;
+    max-width: 250px;
+    margin: 0 auto 6px;
+  }
+  .hero-subheading {
+    font-size: 0.74rem;
+    padding: 6px 12px;
+    margin-bottom: 14px;
+  }
+  .hero-title {
+    font-size: clamp(1.9rem, 7vw, 2.5rem);
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .hero-tagline {
+    font-size: 0.94rem;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 28px;
+    gap: 12px;
+  }
+  .hero-buttons .btn-cyber-primary,
+  .hero-buttons .btn-cyber-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
+  }
   .hero-stats-strip {
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    padding: 16px;
+    gap: 10px;
+    padding: 14px;
+  }
+  .stat-number {
+    font-size: 1.6rem;
+  }
+  .stat-label {
+    font-size: 0.72rem;
+  }
+
+  /* Content Sections */
+  section {
+    padding: 70px 0;
   }
   .about-grid {
     grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .about-visual-card img {
+    height: 280px;
   }
   .about-features-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
   }
   .projects-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   .domains-grid {
     grid-template-columns: 1fr;
+    gap: 18px;
   }
   .timeline-line {
     left: 18px;
@@ -1481,16 +1599,17 @@ section {
   .timeline-item.left .timeline-node, .timeline-item.right .timeline-node {
     left: 11px;
   }
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 24px;
   }
   .footer-bottom {
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     text-align: center;
-  }
-  .hero-visual-stage {
-    height: 320px;
   }
 }

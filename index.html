@@ -42,8 +42,6 @@
   <!-- Background Grid Pattern -->
   <div class="cyber-grid-overlay"></div>
 
-  <!-- 3D Three.js Rotating Official Logo Canvas Container -->
-  <div id="webgl-canvas-container"></div>
 
   <!-- Confetti Canvas -->
   <canvas id="confetti-canvas"></canvas>
@@ -73,6 +71,11 @@
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#team" class="nav-link">Team</a></li>
         <li><a href="#faq" class="nav-link">FAQ</a></li>
+        <li class="mobile-menu-cta">
+          <button class="btn-cyber-primary btn-open-induction" style="width: 100%; justify-content: center; margin-top: 10px;">
+            <i class="fa-solid fa-bolt"></i> Join Club
+          </button>
+        </li>
       </ul>
 
       <!-- Action Buttons -->
@@ -85,7 +88,7 @@
           <span id="sound-status-text">SFX: ON</span>
         </button>
 
-        <button class="btn-cyber-primary btn-open-induction">
+        <button class="btn-cyber-primary btn-open-induction nav-desktop-join-btn">
           <i class="fa-solid fa-bolt"></i> Join Club
         </button>
 
@@ -103,6 +106,11 @@
   <section id="hero" class="hero-section">
     <div class="container">
       <div class="hero-grid">
+        <!-- 3D Rotating Logo Stage (Dedicated Box: Zero Text Overlap!) -->
+        <div class="hero-visual-stage" id="hero-logo-stage">
+          <!-- Three.js 3D rotating official logo renders right inside here -->
+        </div>
+
         <div class="hero-content">
           <div class="hero-subheading">
             <span class="pulse-indicator"></span>
@@ -146,11 +154,6 @@
               <span class="stat-label">Student-Led Startup</span>
             </div>
           </div>
-        </div>
-
-        <!-- 3D Rotating Logo Stage (Clean without HUD clutter) -->
-        <div class="hero-visual-stage">
-          <!-- The rotating 3D official logo renders inside the Three.js canvas right here! -->
         </div>
       </div>
     </div>
