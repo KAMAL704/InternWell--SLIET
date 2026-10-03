@@ -125,3 +125,171 @@
   background: var(--emerald-accent);
   box-shadow: 0 0 6px var(--emerald-accent);
 }
+
+/* ==========================================================================
+   MOVING BACKGROUND STARS CANVAS (ALL PAGES)
+   ========================================================================== */
+#bg-stars-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+/* ==========================================================================
+   CINEMATIC SATELLITE INTRO OVERLAY (3-5 SECONDS)
+   ========================================================================== */
+#cinematic-intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #03060c;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#cinematic-intro-overlay.fade-out {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.intro-map-wrapper {
+  position: relative;
+  width: 86vw;
+  max-width: 880px;
+  height: 52vh;
+  max-height: 480px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 30px rgba(37, 99, 235, 0.3);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s ease;
+}
+
+.intro-map-wrapper.minimizing {
+  transform: scale(0.08) translateY(-140px);
+  opacity: 0;
+  filter: blur(6px);
+}
+
+.intro-stage-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.7s ease, transform 2.0s ease;
+}
+
+#intro-stage-1 {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+#intro-stage-2 {
+  opacity: 0;
+  transform: scale(1.15);
+}
+
+.intro-hud-top {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.76rem;
+  color: var(--blue-light);
+  background: rgba(8, 12, 20, 0.8);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  backdrop-filter: blur(8px);
+  z-index: 5;
+}
+
+.intro-hud-bottom {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.74rem;
+  color: #94a3b8;
+  background: rgba(8, 12, 20, 0.8);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  z-index: 5;
+}
+
+.skip-intro-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  padding: 8px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  color: #ffffff;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  backdrop-filter: blur(10px);
+}
+
+.skip-intro-btn:hover {
+  background: var(--blue-primary);
+  border-color: var(--blue-primary);
+}
+
+@media (max-width: 640px) {
+  .intro-map-wrapper {
+    width: 92vw;
+    height: 44vh;
+  }
+  .intro-hud-top, .intro-hud-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    font-size: 0.68rem;
+    padding: 6px 10px;
+  }
+  .intro-hud-top {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+  }
+  .intro-hud-bottom {
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+  }
+  .skip-intro-btn {
+    top: 14px;
+    right: 14px;
+    padding: 6px 14px;
+    font-size: 0.72rem;
+  }
+}
