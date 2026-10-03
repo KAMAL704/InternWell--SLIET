@@ -1,10 +1,10 @@
 /**
- * INTERNWELL SLIET - Official SLIET Campus Drone Video Full-Screen Intro (5 Seconds)
+ * INTERNWELL SLIET - Official SLIET Campus Drone Video Full-Screen Intro (6 Seconds)
  * Source: Official SLIET Longowal Drone Aerial Tour (assets/videos/sliet_drone.mp4)
  * Features:
  *  1. Native 100vw x 100vh full-screen video with zero lag and instant playback
- *  2. Real-time 5-second countdown & campus telemetry HUD
- *  3. Seamless cinematic fade-out transition into the main InternWell portal
+ *  2. 6-second countdown timer & campus telemetry HUD
+ *  3. Hyperspace portal minimize transition for video & cinematic zoom maximize for main website
  *  4. ESC key & Skip button for instantaneous bypass
  */
 
@@ -20,7 +20,7 @@ class SlietDroneIntro {
     if (!this.overlay) return;
 
     this.isCompleted = false;
-    this.timeLeft = 5;
+    this.timeLeft = 6; // Adjusted to optimal 6-second cinematic window (between 5-7s)
     this.timer = null;
 
     this.init();
@@ -34,7 +34,8 @@ class SlietDroneIntro {
       return;
     }
 
-    // Lock body scrolling during the 5-second video intro
+    // Prepare body & main site for reveal transition
+    document.body.classList.add('intro-active');
     document.body.style.overflow = 'hidden';
 
     // Start video playback immediately
@@ -64,12 +65,12 @@ class SlietDroneIntro {
       }
     });
 
-    // Start the 5-second countdown loop
+    // Start the countdown loop
     this.startCountdown();
   }
 
   startCountdown() {
-    const altitudes = [260, 225, 190, 160, 135];
+    const altitudes = [280, 240, 205, 170, 140, 115];
 
     this.timer = setInterval(() => {
       if (this.isCompleted) {
@@ -86,20 +87,22 @@ class SlietDroneIntro {
 
       // Update altitude telemetry
       if (this.altEl) {
-        const altIndex = Math.max(0, 5 - this.timeLeft - 1);
-        this.altEl.textContent = `${altitudes[altIndex] || 150}M`;
+        const altIndex = Math.max(0, 6 - this.timeLeft - 1);
+        this.altEl.textContent = `${altitudes[altIndex] || 120}M`;
       }
 
-      // Status text updates
+      // Dynamic telemetry status updates
       if (this.statusEl) {
-        if (this.timeLeft === 3) {
+        if (this.timeLeft === 4) {
           this.statusEl.textContent = 'CAMPUS AERIAL TOUR // SLIET LONGOWAL [ACADEMIC & SPORTS COMPLEX]';
+        } else if (this.timeLeft === 2) {
+          this.statusEl.textContent = 'APPROACHING GROUND LEVEL // INITIATING PORTAL DEPLOYMENT';
         } else if (this.timeLeft === 1) {
           this.statusEl.textContent = 'DRONE SHOW COMPLETE // WELCOME TO INTERNWELL SLIET';
         }
       }
 
-      // When 5 seconds expire, close intro smoothly
+      // When countdown reaches 0, trigger smooth transition
       if (this.timeLeft <= 0) {
         clearInterval(this.timer);
         this.closeIntro();
@@ -115,22 +118,38 @@ class SlietDroneIntro {
       clearInterval(this.timer);
     }
 
-    if (this.overlay) {
-      if (immediate) {
-        this.overlay.style.display = 'none';
-        if (this.video) this.video.pause();
-      } else {
-        this.overlay.classList.add('fade-out');
-        if (window.cyberAudio) window.cyberAudio.playSuccess();
-
-        setTimeout(() => {
-          this.overlay.style.display = 'none';
-          if (this.video) this.video.pause();
-        }, 750);
-      }
+    if (immediate) {
+      document.body.classList.remove('intro-active');
+      document.body.classList.remove('intro-revealing');
+      if (this.overlay) this.overlay.style.display = 'none';
+      if (this.video) this.video.pause();
+      document.body.style.overflow = 'auto';
+      return;
     }
 
-    document.body.style.overflow = 'auto';
+    // 1. Simultaneously trigger portal-minimize on the video overlay & maximize zoom on main site
+    document.body.classList.remove('intro-active');
+    document.body.classList.add('intro-revealing');
+
+    if (this.overlay) {
+      this.overlay.classList.add('portal-minimize');
+    }
+
+    if (window.cyberAudio) {
+      window.cyberAudio.playSuccess();
+    }
+
+    // 2. Complete transition after animation curve finishes
+    setTimeout(() => {
+      if (this.overlay) {
+        this.overlay.style.display = 'none';
+      }
+      if (this.video) {
+        this.video.pause();
+      }
+      document.body.style.overflow = 'auto';
+      document.body.classList.remove('intro-revealing');
+    }, 950);
   }
 }
 
