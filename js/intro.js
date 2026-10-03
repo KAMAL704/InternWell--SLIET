@@ -1,36 +1,57 @@
 /**
- * INTERNWELL SLIET - Cinematic 3-5s SLIET Campus Drone View & Rocket/Jet Flyover Intro
- * Reference: SLIET Longowal Campus Drone Aerial View (https://youtu.be/ZaKe_QHThJk)
+ * INTERNWELL SLIET - Official SLIET Campus Drone Video Full-Screen Intro (5 Seconds)
+ * Source: Official SLIET Longowal Drone Aerial Tour (assets/videos/sliet_drone.mp4)
  * Features:
- *  1. Supersonic aircraft / rocket flyover across SLIET campus sky with afterburner flame & smoke trail
- *  2. Real SLIET drone footage embed + high-res drone photography backdrop
- *  3. Live altitude countdown & tactical HUD telemetry
- *  4. Smooth map minimization sequence revealing InternWell SLIET portal
- *  5. ESC key & Skip button support
+ *  1. Native 100vw x 100vh full-screen video with zero lag and instant playback
+ *  2. Real-time 5-second countdown & campus telemetry HUD
+ *  3. Seamless cinematic fade-out transition into the main InternWell portal
+ *  4. ESC key & Skip button for instantaneous bypass
  */
 
 class SlietDroneIntro {
   constructor() {
     this.overlay = document.getElementById('cinematic-intro-overlay');
+    this.video = document.getElementById('intro-drone-video');
     this.skipBtn = document.getElementById('skip-intro-btn');
+    this.countdownEl = document.getElementById('intro-countdown-num');
+    this.altEl = document.getElementById('intro-altitude-val');
+    this.statusEl = document.getElementById('intro-status-text');
+
     if (!this.overlay) return;
 
-    this.timer = null;
     this.isCompleted = false;
+    this.timeLeft = 5;
+    this.timer = null;
 
     this.init();
   }
 
   init() {
-    // Only play on the homepage
+    // Only run on the homepage
     const isHome = window.location.pathname.endsWith('index.html') || window.location.pathname === '/' || window.location.pathname.endsWith('/');
     if (!isHome) {
       this.closeIntro(true);
       return;
     }
 
-    // Lock body scrolling during the 4-second flyover
+    // Lock body scrolling during the 5-second video intro
     document.body.style.overflow = 'hidden';
+
+    // Start video playback immediately
+    if (this.video) {
+      this.video.currentTime = 0;
+      const playPromise = this.video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((err) => {
+          console.warn('Video auto-play restricted by browser policy:', err);
+        });
+      }
+    }
+
+    // Play subtle entry chime
+    if (window.cyberAudio) {
+      window.cyberAudio.playHover();
+    }
 
     // Hook Skip button & ESC key
     if (this.skipBtn) {
@@ -43,70 +64,69 @@ class SlietDroneIntro {
       }
     });
 
-    // Start the cinematic progression
-    this.runSequence();
+    // Start the 5-second countdown loop
+    this.startCountdown();
   }
 
-  runSequence() {
-    const altReadout = document.getElementById('intro-altitude-val');
-    const statusText = document.getElementById('intro-status-text');
+  startCountdown() {
+    const altitudes = [260, 225, 190, 160, 135];
 
-    // Stage 1: 0s - 1.4s (Flyover Begins, Jet Streaks Across Sky)
-    if (window.cyberAudio) window.cyberAudio.playHover();
-
-    setTimeout(() => {
-      if (this.isCompleted) return;
-      if (statusText) statusText.textContent = 'SUPERSONIC FLYOVER // SLIET LONGOWAL CAMPUS';
-      if (window.cyberAudio) window.cyberAudio.playBlip();
-    }, 1300);
-
-    // Altitude descent countdown
-    let alt = 850;
-    const altInterval = setInterval(() => {
+    this.timer = setInterval(() => {
       if (this.isCompleted) {
-        clearInterval(altInterval);
+        clearInterval(this.timer);
         return;
       }
-      alt = Math.max(120, alt - 65);
-      if (altReadout) altReadout.textContent = `${alt}M`;
-      if (alt <= 120) clearInterval(altInterval);
-    }, 180);
 
-    // Stage 2: 2.6s (Target Locked)
-    setTimeout(() => {
-      if (this.isCompleted) return;
-      if (statusText) statusText.textContent = 'CAMPUS LOCK: 30.2244° N, 75.6881° E [LONGOWAL]';
-    }, 2600);
+      this.timeLeft -= 1;
 
-    // Stage 3: 3.7s (Minimize Map & Open Main Portal)
-    setTimeout(() => {
-      if (this.isCompleted) return;
-      const mapBox = document.getElementById('intro-map-wrapper');
-      if (mapBox) {
-        mapBox.classList.add('minimizing');
+      // Update countdown display
+      if (this.countdownEl) {
+        this.countdownEl.textContent = `${this.timeLeft}s`;
       }
-      if (statusText) statusText.textContent = 'FLYOVER COMPLETE // ENTERING INTERNWELL';
-      if (window.cyberAudio) window.cyberAudio.playSuccess();
-    }, 3700);
 
-    // Final Stage: 4.4s (Fade out overlay completely)
-    setTimeout(() => {
-      this.closeIntro();
-    }, 4400);
+      // Update altitude telemetry
+      if (this.altEl) {
+        const altIndex = Math.max(0, 5 - this.timeLeft - 1);
+        this.altEl.textContent = `${altitudes[altIndex] || 150}M`;
+      }
+
+      // Status text updates
+      if (this.statusEl) {
+        if (this.timeLeft === 3) {
+          this.statusEl.textContent = 'CAMPUS AERIAL TOUR // SLIET LONGOWAL [ACADEMIC & SPORTS COMPLEX]';
+        } else if (this.timeLeft === 1) {
+          this.statusEl.textContent = 'DRONE SHOW COMPLETE // WELCOME TO INTERNWELL SLIET';
+        }
+      }
+
+      // When 5 seconds expire, close intro smoothly
+      if (this.timeLeft <= 0) {
+        clearInterval(this.timer);
+        this.closeIntro();
+      }
+    }, 1000);
   }
 
   closeIntro(immediate = false) {
     if (this.isCompleted) return;
     this.isCompleted = true;
 
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+
     if (this.overlay) {
       if (immediate) {
         this.overlay.style.display = 'none';
+        if (this.video) this.video.pause();
       } else {
         this.overlay.classList.add('fade-out');
+        if (window.cyberAudio) window.cyberAudio.playSuccess();
+
         setTimeout(() => {
           this.overlay.style.display = 'none';
-        }, 600);
+          if (this.video) this.video.pause();
+        }, 750);
       }
     }
 
