@@ -1,10 +1,10 @@
 /**
- * INTERNWELL SLIET - Official SLIET Campus Drone Video Full-Screen Intro (6 Seconds)
+ * INTERNWELL SLIET - Official SLIET Campus Drone Video Full-Screen Intro (4.5 Seconds)
  * Source: Official SLIET Longowal Drone Aerial Tour (assets/videos/sliet_drone.mp4)
  * Features:
  *  1. Native 100vw x 100vh full-screen video with zero lag and instant playback
- *  2. 6-second countdown timer & campus telemetry HUD
- *  3. Hyperspace portal minimize transition for video & cinematic zoom maximize for main website
+ *  2. Exactly 4.5-second countdown & live campus altitude telemetry
+ *  3. Dramatic end-of-video portal minimize warp & beginning-of-site epic zoom maximize animation
  *  4. ESC key & Skip button for instantaneous bypass
  */
 
@@ -20,8 +20,9 @@ class SlietDroneIntro {
     if (!this.overlay) return;
 
     this.isCompleted = false;
-    this.timeLeft = 6; // Adjusted to optimal 6-second cinematic window (between 5-7s)
-    this.timer = null;
+    this.totalDurationMs = 4500; // 4.5 seconds
+    this.startTime = null;
+    this.rafId = null;
 
     this.init();
   }
@@ -65,57 +66,59 @@ class SlietDroneIntro {
       }
     });
 
-    // Start the countdown loop
+    // Start 4.5-second countdown loop
     this.startCountdown();
   }
 
   startCountdown() {
-    const altitudes = [280, 240, 205, 170, 140, 115];
+    this.startTime = performance.now();
 
-    this.timer = setInterval(() => {
-      if (this.isCompleted) {
-        clearInterval(this.timer);
-        return;
-      }
+    const updateLoop = (now) => {
+      if (this.isCompleted) return;
 
-      this.timeLeft -= 1;
+      const elapsed = now - this.startTime;
+      const remainingMs = Math.max(0, this.totalDurationMs - elapsed);
+      const remainingSec = (remainingMs / 1000).toFixed(1);
 
-      // Update countdown display
+      // Update countdown UI
       if (this.countdownEl) {
-        this.countdownEl.textContent = `${this.timeLeft}s`;
+        this.countdownEl.textContent = `${remainingSec}s`;
       }
 
-      // Update altitude telemetry
+      // Update altitude telemetry based on progress
       if (this.altEl) {
-        const altIndex = Math.max(0, 6 - this.timeLeft - 1);
-        this.altEl.textContent = `${altitudes[altIndex] || 120}M`;
+        const progress = Math.min(1, elapsed / this.totalDurationMs);
+        const alt = Math.round(260 - progress * 150); // 260M down to 110M
+        this.altEl.textContent = `${alt}M`;
       }
 
       // Dynamic telemetry status updates
       if (this.statusEl) {
-        if (this.timeLeft === 4) {
+        if (remainingMs <= 1800 && remainingMs > 800) {
           this.statusEl.textContent = 'CAMPUS AERIAL TOUR // SLIET LONGOWAL [ACADEMIC & SPORTS COMPLEX]';
-        } else if (this.timeLeft === 2) {
-          this.statusEl.textContent = 'APPROACHING GROUND LEVEL // INITIATING PORTAL DEPLOYMENT';
-        } else if (this.timeLeft === 1) {
-          this.statusEl.textContent = 'DRONE SHOW COMPLETE // WELCOME TO INTERNWELL SLIET';
+        } else if (remainingMs <= 800) {
+          this.statusEl.textContent = 'DRONE SHOW COMPLETE // INITIALIZING PORTAL WARP';
         }
       }
 
-      // When countdown reaches 0, trigger smooth transition
-      if (this.timeLeft <= 0) {
-        clearInterval(this.timer);
+      // When 4.5 seconds expire, trigger smooth transition
+      if (remainingMs <= 0) {
         this.closeIntro();
+        return;
       }
-    }, 1000);
+
+      this.rafId = requestAnimationFrame(updateLoop);
+    };
+
+    this.rafId = requestAnimationFrame(updateLoop);
   }
 
   closeIntro(immediate = false) {
     if (this.isCompleted) return;
     this.isCompleted = true;
 
-    if (this.timer) {
-      clearInterval(this.timer);
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
     }
 
     if (immediate) {
@@ -127,7 +130,7 @@ class SlietDroneIntro {
       return;
     }
 
-    // 1. Simultaneously trigger portal-minimize on the video overlay & maximize zoom on main site
+    // 1. Simultaneously trigger portal-minimize on the video overlay & epic maximize on main site
     document.body.classList.remove('intro-active');
     document.body.classList.add('intro-revealing');
 
@@ -135,11 +138,16 @@ class SlietDroneIntro {
       this.overlay.classList.add('portal-minimize');
     }
 
+    // 2. Play futuristic portal warp audio whoosh
     if (window.cyberAudio) {
-      window.cyberAudio.playSuccess();
+      if (typeof window.cyberAudio.playPortalWarp === 'function') {
+        window.cyberAudio.playPortalWarp();
+      } else {
+        window.cyberAudio.playSuccess();
+      }
     }
 
-    // 2. Complete transition after animation curve finishes
+    // 3. Complete transition after animation curve finishes
     setTimeout(() => {
       if (this.overlay) {
         this.overlay.style.display = 'none';
@@ -149,7 +157,7 @@ class SlietDroneIntro {
       }
       document.body.style.overflow = 'auto';
       document.body.classList.remove('intro-revealing');
-    }, 950);
+    }, 1000);
   }
 }
 

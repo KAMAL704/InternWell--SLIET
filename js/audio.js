@@ -114,6 +114,37 @@ class CyberAudio {
     } catch (e) {}
   }
 
+  playPortalWarp() {
+    if (this.muted) return;
+    this.ensureContext();
+    if (!this.ctx) return;
+
+    try {
+      // Hyperspace warp / portal whoosh sound
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.3);
+      osc.frequency.exponentialRampToValueAtTime(440, this.ctx.currentTime + 0.65);
+
+      gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.65);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.65);
+
+      // Add ascending melodic chord on top
+      setTimeout(() => {
+        this.playSuccess();
+      }, 250);
+    } catch (e) {}
+  }
+
   playKeypress() {
     if (this.muted) return;
     this.ensureContext();
