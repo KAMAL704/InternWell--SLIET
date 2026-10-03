@@ -37,27 +37,60 @@
   <!-- Moving Background Cosmic Stars Canvas (Across All Pages) -->
   <canvas id="bg-stars-canvas"></canvas>
 
-  <!-- 3-5 Second Cinematic Satellite Reconnaissance & Minimizing Map Intro -->
+  <!-- 3-5 Second Cinematic SLIET Campus Drone View & Rocket/Jet Flyover Intro -->
   <div id="cinematic-intro-overlay">
-    <button id="skip-intro-btn" class="skip-intro-btn">Skip Intro ➔ [ESC]</button>
+    <button id="skip-intro-btn" class="skip-intro-btn">Skip Flyover ➔ [ESC]</button>
 
     <div class="intro-map-wrapper" id="intro-map-wrapper">
-      <!-- Stage 1: Orbital Space Telemetry -->
-      <img id="intro-stage-1" class="intro-stage-img" src="./assets/images/satellite_intro.jpg" alt="Orbital Satellite View">
+      <!-- 1. Real SLIET Aerial Drone Tour Video Embed (YouTube Reference: ZaKe_QHThJk) -->
+      <iframe 
+        id="intro-yt-iframe" 
+        class="intro-stage-video"
+        src="https://www.youtube-nocookie.com/embed/ZaKe_QHThJk?autoplay=1&mute=1&controls=0&loop=1&playlist=ZaKe_QHThJk&playsinline=1&rel=0&start=3&enablejsapi=1" 
+        title="SLIET Longowal Aerial Drone Tour" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture">
+      </iframe>
 
-      <!-- Stage 2: Tactical Reconnaissance Map of SLIET Campus -->
-      <img id="intro-stage-2" class="intro-stage-img" src="./assets/images/satellite_target.jpg" alt="SLIET Tactical Satellite Map">
+      <!-- 2. High-Res Cinematic Campus Flyover View & Supersonic Aircraft -->
+      <div id="intro-drone-backdrop" class="intro-drone-backdrop">
+        <img src="./assets/images/sliet_drone_flyover.jpg" alt="SLIET Aerial Campus Drone View" class="drone-flyover-img">
+        
+        <!-- Animated Jet/Rocket Streaking Across the Sky -->
+        <div class="sky-flyover-aircraft">
+          <div class="jet-afterburner-flame"></div>
+          <div class="jet-condensation-trail"></div>
+          <svg class="flyover-jet-svg" viewBox="0 0 140 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="fuselageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#475569" />
+                <stop offset="50%" stop-color="#1e293b" />
+                <stop offset="100%" stop-color="#0f172a" />
+              </linearGradient>
+            </defs>
+            <path d="M138 22L105 15L65 17L30 19L5 22L30 25L65 27L105 29Z" fill="url(#fuselageGrad)" stroke="#38bdf8" stroke-width="0.8"/>
+            <path d="M85 16L30 3L22 7L38 18Z" fill="#334155" stroke="#64748b" stroke-width="0.8"/>
+            <path d="M85 28L30 41L22 37L38 26Z" fill="#1e293b" stroke="#64748b" stroke-width="0.8"/>
+            <polygon points="112,22 95,19 92,25" fill="#38bdf8" opacity="0.85"/>
+            <polygon points="35,14 15,6 18,17" fill="#475569"/>
+            <polygon points="35,30 15,38 18,27" fill="#334155"/>
+          </svg>
+        </div>
+      </div>
 
       <!-- Top HUD -->
       <div class="intro-hud-top">
-        <div><i class="fa-solid fa-satellite" style="color: var(--blue-light);"></i> <span id="intro-status-text">ACQUIRING SATELLITE TELEMETRY...</span></div>
-        <div>SAT-07 // ORBITAL LOCK</div>
+        <div><i class="fa-solid fa-plane-departure" style="color: var(--blue-light);"></i> <span id="intro-status-text">SLIET LONGOWAL AERIAL RECON ACTIVE...</span></div>
+        <div class="intro-hud-badge">MACH 2.2 // JET PATROL</div>
       </div>
 
       <!-- Bottom HUD -->
       <div class="intro-hud-bottom">
-        <div>COORDINATES: 30.2244° N, 75.6881° E [SLIET LONGOWAL]</div>
-        <div>ALTITUDE: <span id="intro-altitude-val" style="color: #38bdf8; font-weight: 700;">412.3 KM</span></div>
+        <div>COORDINATES: 30.2244° N, 75.6881° E [SLIET CAMPUS]</div>
+        <div class="hud-telemetry-right">
+          ALT: <span id="intro-altitude-val" style="color: #38bdf8; font-weight: 700;">850M</span>
+          <span class="hud-divider">|</span>
+          <span style="color: #10b981;">● DRONE ONLINE</span>
+        </div>
       </div>
     </div>
   </div>

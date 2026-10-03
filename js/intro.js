@@ -1,9 +1,15 @@
 /**
- * INTERNWELL SLIET - 3-5s Cinematic Satellite Intro Sequence
- * Satellite orbital view -> Zooming in to SLIET Longowal coordinates -> Minimizing map -> Revealing main portal
+ * INTERNWELL SLIET - Cinematic 3-5s SLIET Campus Drone View & Rocket/Jet Flyover Intro
+ * Reference: SLIET Longowal Campus Drone Aerial View (https://youtu.be/ZaKe_QHThJk)
+ * Features:
+ *  1. Supersonic aircraft / rocket flyover across SLIET campus sky with afterburner flame & smoke trail
+ *  2. Real SLIET drone footage embed + high-res drone photography backdrop
+ *  3. Live altitude countdown & tactical HUD telemetry
+ *  4. Smooth map minimization sequence revealing InternWell SLIET portal
+ *  5. ESC key & Skip button support
  */
 
-class SatelliteIntro {
+class SlietDroneIntro {
   constructor() {
     this.overlay = document.getElementById('cinematic-intro-overlay');
     this.skipBtn = document.getElementById('skip-intro-btn');
@@ -23,7 +29,7 @@ class SatelliteIntro {
       return;
     }
 
-    // Lock body scrolling during the 4-second intro
+    // Lock body scrolling during the 4-second flyover
     document.body.style.overflow = 'hidden';
 
     // Hook Skip button & ESC key
@@ -42,53 +48,51 @@ class SatelliteIntro {
   }
 
   runSequence() {
-    const stage1 = document.getElementById('intro-stage-1');
-    const stage2 = document.getElementById('intro-stage-2');
     const altReadout = document.getElementById('intro-altitude-val');
     const statusText = document.getElementById('intro-status-text');
 
-    // Stage 1: 0s - 1.8s (Orbital Satellite Telemetry)
-    setTimeout(() => {
-      if (this.isCompleted) return;
-      if (statusText) statusText.textContent = 'TARGET ACQUIRED: SLIET LONGOWAL, PUNJAB';
-      if (window.cyberAudio) window.cyberAudio.playHover();
-    }, 1200);
+    // Stage 1: 0s - 1.4s (Flyover Begins, Jet Streaks Across Sky)
+    if (window.cyberAudio) window.cyberAudio.playHover();
 
-    // Stage 2: 1.8s - 3.4s (Descent & Tactical Campus Map)
     setTimeout(() => {
       if (this.isCompleted) return;
-      if (stage1) stage1.style.opacity = '0';
-      if (stage2) {
-        stage2.style.opacity = '1';
-        stage2.style.transform = 'scale(1)';
-      }
-      if (statusText) statusText.textContent = 'TACTICAL MAP: 30.2244° N, 75.6881° E [CAMPUS LOCK]';
+      if (statusText) statusText.textContent = 'SUPERSONIC FLYOVER // SLIET LONGOWAL CAMPUS';
       if (window.cyberAudio) window.cyberAudio.playBlip();
+    }, 1300);
 
-      // Animate altitude descent
-      let alt = 485;
-      const altInterval = setInterval(() => {
-        alt = Math.max(0, alt - 55);
-        if (altReadout) altReadout.textContent = `${alt}.0 KM`;
-        if (alt <= 0) clearInterval(altInterval);
-      }, 120);
-    }, 1800);
+    // Altitude descent countdown
+    let alt = 850;
+    const altInterval = setInterval(() => {
+      if (this.isCompleted) {
+        clearInterval(altInterval);
+        return;
+      }
+      alt = Math.max(120, alt - 65);
+      if (altReadout) altReadout.textContent = `${alt}M`;
+      if (alt <= 120) clearInterval(altInterval);
+    }, 180);
 
-    // Stage 3: 3.4s - 4.5s (Minimize Map & Reveal Portal)
+    // Stage 2: 2.6s (Target Locked)
+    setTimeout(() => {
+      if (this.isCompleted) return;
+      if (statusText) statusText.textContent = 'CAMPUS LOCK: 30.2244° N, 75.6881° E [LONGOWAL]';
+    }, 2600);
+
+    // Stage 3: 3.7s (Minimize Map & Open Main Portal)
     setTimeout(() => {
       if (this.isCompleted) return;
       const mapBox = document.getElementById('intro-map-wrapper');
       if (mapBox) {
         mapBox.classList.add('minimizing');
       }
-      if (statusText) statusText.textContent = 'PORTAL INITIALIZED // ENTERING INTERNWELL';
+      if (statusText) statusText.textContent = 'FLYOVER COMPLETE // ENTERING INTERNWELL';
       if (window.cyberAudio) window.cyberAudio.playSuccess();
-    }, 3400);
+    }, 3700);
 
-    // Final Stage: 4.3s (Fade out overlay completely)
+    // Final Stage: 4.4s (Fade out overlay completely)
     setTimeout(() => {
       this.closeIntro();
-    }, 4300);
+    }, 4400);
   }
 
   closeIntro(immediate = false) {
@@ -112,5 +116,5 @@ class SatelliteIntro {
 
 // Start once DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
-  window.satelliteIntro = new SatelliteIntro();
+  window.slietDroneIntro = new SlietDroneIntro();
 });

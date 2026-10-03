@@ -107,28 +107,50 @@ class LogoScene3D {
         texture.anisotropy = this.renderer.capabilities.getMaxAnisotropy();
 
         const radius = window.innerWidth < 768 ? 2.6 : 3.2;
-        const thickness = 0.3;
-        const geometry = new THREE.CylinderGeometry(radius, radius, thickness, 64);
+        const thickness = 0.28;
 
-        // Materials:
-        // Index 0: Rim (metallic dark slate)
-        const rimMaterial = new THREE.MeshStandardMaterial({
+        this.emblemMesh = new THREE.Group();
+
+        // 1. Front Face (Upright with INTERNWELL SLIET on downside)
+        const frontMat = new THREE.MeshStandardMaterial({
+          map: texture,
+          metalness: 0.12,
+          roughness: 0.35,
+          side: THREE.FrontSide
+        });
+        const frontMesh = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), frontMat);
+        frontMesh.position.z = thickness / 2;
+        this.emblemMesh.add(frontMesh);
+
+        // 2. Back Face (Dual-sided so it stays upright during 360-degree spin)
+        const backTexture = texture.clone();
+        backTexture.center.set(0.5, 0.5);
+        backTexture.repeat.x = -1; // un-mirror text on reverse side
+        backTexture.needsUpdate = true;
+
+        const backMat = new THREE.MeshStandardMaterial({
+          map: backTexture,
+          metalness: 0.12,
+          roughness: 0.35,
+          side: THREE.FrontSide
+        });
+        const backMesh = new THREE.Mesh(new THREE.CircleGeometry(radius, 64), backMat);
+        backMesh.position.z = -thickness / 2;
+        backMesh.rotation.y = Math.PI; // Face backwards towards -Z
+        this.emblemMesh.add(backMesh);
+
+        // 3. Metallic Outer Rim
+        const rimGeo = new THREE.CylinderGeometry(radius, radius, thickness, 64, 1, true);
+        const rimMat = new THREE.MeshStandardMaterial({
           color: 0x1e293b,
           metalness: 0.85,
           roughness: 0.25,
           emissive: 0x0f172a
         });
+        const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+        rimMesh.rotation.x = Math.PI / 2;
+        this.emblemMesh.add(rimMesh);
 
-        // Index 1: Front Cap (Official Logo)
-        const capMaterial = new THREE.MeshStandardMaterial({
-          map: texture,
-          metalness: 0.08,
-          roughness: 0.35
-        });
-
-        this.emblemMesh = new THREE.Mesh(geometry, [rimMaterial, capMaterial, capMaterial]);
-        // Rotate cylinder so caps face the camera
-        this.emblemMesh.rotation.x = Math.PI / 2;
         this.emblemGroup.add(this.emblemMesh);
 
         // Accent outer rings (matching logo's blue & red)
@@ -136,20 +158,22 @@ class LogoScene3D {
         const ringMat = new THREE.MeshBasicMaterial({
           color: 0x38bdf8,
           transparent: true,
-          opacity: 0.7
+          opacity: 0.75
         });
         this.orbitalRing = new THREE.Mesh(ringGeo, ringMat);
-        this.orbitalRing.rotation.x = Math.PI / 2.8;
+        this.orbitalRing.rotation.x = Math.PI / 2.6;
+        this.orbitalRing.rotation.y = 0.2;
         this.emblemGroup.add(this.orbitalRing);
 
         const ring2Geo = new THREE.TorusGeometry(radius + 0.65, 0.02, 16, 100);
         const ring2Mat = new THREE.MeshBasicMaterial({
           color: 0xe11d48,
           transparent: true,
-          opacity: 0.5
+          opacity: 0.6
         });
         this.orbitalRing2 = new THREE.Mesh(ring2Geo, ring2Mat);
-        this.orbitalRing2.rotation.y = Math.PI / 3;
+        this.orbitalRing2.rotation.y = Math.PI / 2.8;
+        this.orbitalRing2.rotation.x = 0.3;
         this.emblemGroup.add(this.orbitalRing2);
       },
       undefined,
@@ -185,20 +209,21 @@ class LogoScene3D {
     this.mouseX += (this.targetMouseX - this.mouseX) * 0.05;
     this.mouseY += (this.targetMouseY - this.mouseY) * 0.05;
 
-    // Smooth 3D spinning rotation
+    // Smooth 3D horizontal medallion spin around vertical Y-axis:
+    // Keeps "INTERNWELL SLIET" text at the downside (bottom) at all times (always upright)!
     if (this.emblemMesh) {
-      this.emblemMesh.rotation.z += 0.012;
+      this.emblemMesh.rotation.y += 0.014;
       this.emblemMesh.position.y = Math.sin(time * 1.5) * 0.15;
 
-      this.emblemGroup.rotation.y = this.mouseX * 0.25;
-      this.emblemGroup.rotation.x = -this.mouseY * 0.2;
+      this.emblemGroup.rotation.x = -this.mouseY * 0.15;
+      this.emblemGroup.rotation.z = -this.mouseX * 0.06;
     }
 
     if (this.orbitalRing) {
       this.orbitalRing.rotation.z += 0.008;
     }
     if (this.orbitalRing2) {
-      this.orbitalRing2.rotation.x += 0.006;
+      this.orbitalRing2.rotation.z -= 0.006;
     }
 
     this.renderer.render(this.scene, this.camera);
