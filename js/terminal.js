@@ -1,5 +1,5 @@
 /**
- * INTERNWELL SLIET - Interactive Cyber Terminal
+ * INTERNWELL SLIET - Interactive Club Console (Terminal)
  */
 
 class CyberTerminal {
@@ -13,93 +13,83 @@ class CyberTerminal {
 
     this.commands = {
       help: () => `
-Available system commands:
-  • <span style="color:#00f2fe">about</span>       - Learn about InternWell SLIET & mission
-  • <span style="color:#00f2fe">domains</span>     - List technical domains & skill tracks
-  • <span style="color:#00f2fe">events</span>      - Display flagship events & Coding Spardha
-  • <span style="color:#00f2fe">projects</span>    - View innovation lab projects (CycleOne, etc.)
-  • <span style="color:#00f2fe">stats</span>       - Inspect campus placement & member metrics
-  • <span style="color:#00f2fe">sliet</span>       - Details about SLIET Longowal campus
-  • <span style="color:#00f2fe">leads</span>       - Faculty advisor & core coordinators
-  • <span style="color:#00f2fe">apply</span>       - Open the 2024-2025 induction application modal
-  • <span style="color:#00f2fe">matrix</span>      - Trigger digital matrix cyber rain
-  • <span style="color:#00f2fe">3d [mode]</span>   - Switch 3D scene: 'core', 'grid', or 'constellation'
-  • <span style="color:#00f2fe">contact</span>     - Official email and Instagram handle
-  • <span style="color:#00f2fe">clear</span>       - Clear the terminal screen
+Available club commands:
+  • <span style="color:#38bdf8">about</span>       - Learn about InternWell SLIET & socio-startup mission
+  • <span style="color:#38bdf8">founders</span>    - Meet the founders (Sachin Korla & Ayush Thakur)
+  • <span style="color:#38bdf8">events</span>      - View Coding Spardha, IW Talks & I-MAT
+  • <span style="color:#38bdf8">domains</span>     - List technical & design skill tracks
+  • <span style="color:#38bdf8">projects</span>    - View SME solutions and student platforms
+  • <span style="color:#38bdf8">stats</span>       - Inspect student and placement metrics
+  • <span style="color:#38bdf8">leads</span>       - Faculty advisor & student coordinators
+  • <span style="color:#38bdf8">apply</span>       - Open the induction application form
+  • <span style="color:#38bdf8">contact</span>     - Official email and Instagram handle
+  • <span style="color:#38bdf8">clear</span>       - Clear the console screen
 `,
       about: () => `
 [INTERNWELL SLIET PROFILE]
-InternWell is the premier technical & career acceleration cell of 
+InternWell is a Socio-Startup and upskilling technical forum at
 Sant Longowal Institute of Engineering & Technology (SLIET), Punjab.
-• Founded under the aegis of Dean (Student-Faculty Welfare) & IIC SLIET
-• Objective: Bridging collegiate academics and high-tier engineering careers
-• Pillars: High-impact technical projects, internships, hackathons & community mentorship
+• Mission: Empowering SMEs with custom websites and mobile apps developed by talented interns.
+• Upskilling: Providing students with real freelancing & industrial experience.
+• Faculty Advisor: Dr. A. S. Arora (Professor, Department of EIE)
+`,
+      founders: () => `
+[OUR FOUNDERS]
+• Sachin Korla (Founder): Entrepreneurial CS engineer, Rex Karamveer Chakra awardee, Dell Campassador Season 4, Harvard US-India Initiative.
+• Ayush Thakur (Founder & Design Head): Creative product designer, Internshala Gold Certificate, MyCampus Store designer.
 `,
       domains: () => `
-[TECHNICAL DOMAINS]
-1. Full-Stack Web & Mobile Engineering (React, Next.js, Node, Go, Flutter)
-2. Artificial Intelligence & Data Science (PyTorch, LLMs, Computer Vision)
-3. Cloud, DevOps & Distributed Systems (Docker, Kubernetes, AWS, CI/CD)
-4. UI/UX & Human-Computer Interaction (Figma, Design Systems, 3D Web)
-5. Competitive Programming & Data Structures (C++, Codeforces, LeetCode)
-6. Open-Source Software & Systems Engineering
+[TECHNICAL & CREATIVE DIVISIONS]
+1. Full-Stack Web & App Development (React, Node.js, Next.js, Flutter)
+2. Artificial Intelligence & Data Science (PyTorch, Python, Computer Vision)
+3. Cloud & DevOps (Docker, Linux, AWS, CI/CD)
+4. UI/UX & Creative Design (Figma, Design Systems, Motion Design)
+5. Competitive Programming & DSA (C++, Algorithms, LeetCode)
+6. Open Source & Event Management
 `,
       events: () => `
-[FLAGSHIP EVENTS]
-• <span style="color:#00f5a0">Coding Spardha</span>: Annual multi-track hackathon (Web-O-Design, Code Manthan, Dark Code)
-• <span style="color:#00f5a0">IW Talks</span>: Fireside tech chats with leaders at Google, Amazon, Microsoft & Unicorns
-• <span style="color:#00f5a0">IW-SoC</span>: Open-Source Summer of Code for SLIET campus utilities
-• <span style="color:#00f5a0">Internship Accelerator Bootcamp</span>: Resume reviews, referrals & mock interviews
+[SIGNATURE EVENTS]
+• <span style="color:#10b981">IW Talks</span>: Guidance and AMA sessions on career, life, and tech roadmaps.
+• <span style="color:#10b981">Coding Spardha</span>: Annual hackathon with SSDC (Web-O-Design, Code Manthan, Dark Code).
+• <span style="color:#10b981">I-MAT</span>: 100-question competitive mental ability and aptitude test.
+• <span style="color:#10b981">Constitution Awareness</span>: Campus buzzer-round social and civic quizzes.
 `,
       projects: () => `
-[INNOVATION LAB HIGHLIGHTS]
-• <span style="color:#00f2fe">CycleOne IoT Telemetry</span>: Smart bike-sharing IoT platform (SLIET funded)
-• <span style="color:#00f2fe">SLIET Campus Central</span>: Notes, pyqs, campus maps & academic resources
-• <span style="color:#00f2fe">AlgoSpardha</span>: Automated contest leaderboard for SLIET programmers
-• <span style="color:#00f2fe">InternRadar</span>: Aggregated tech internships & referral matching engine
+[INTERNWELL INITIATIVES]
+• <span style="color:#38bdf8">SME Digital Launchpad</span>: Live freelancing websites & web apps built for small enterprises.
+• <span style="color:#38bdf8">AlgoSpardha Platform</span>: Automated live contest arena for campus coders.
+• <span style="color:#38bdf8">IW Talks Archive</span>: Curated guidance notes and mentorship roadmaps.
+• <span style="color:#38bdf8">I-MAT Prep Engine</span>: Objective aptitude question bank for placements.
 `,
       stats: () => `
-[INTERNWELL IMPACT METRICS]
-• Active Student Members: 500+
-• Tier-1 Internships Cracked: 50+
-• Campus Hackathons & Sprints: 12+
-• Industry Mentors & Alumni Network: 80+
-• Placement Acceleration: 100% Student-Driven
-`,
-      sliet: () => `
-[INSTITUTE DATA]
-Sant Longowal Institute of Engineering & Technology (SLIET)
-• Status: Deemed-to-be-University (Ministry of Education, Govt. of India)
-• Coordinates: 30.2244° N, 75.6881° E | Longowal, Sangrur, Punjab 148106
-• Campus: 451 acres lush green technological hub
+[IMPACT METRICS]
+• Students Mentored: 500+
+• Industry Internships Secured: 50+
+• I-MAT Aptitude Challengers: 100+
+• Model: 100% Student-Led Socio-Startup
 `,
       leads: () => `
 [LEADERSHIP & ADVISORY]
-• Faculty Advisor: Dr. A. S. Arora (Professor, EIE Dept, SLIET)
-• Student Coordinators: Technical Leads, Domain Mentors, PR & Design Heads
-• Contact: internwellclub@gmail.com
+• Faculty Advisor: Dr. A. S. Arora (Professor, Dept of EIE, SLIET)
+• Student Coordinators: Siddharth Tiwari, Abhigyan Prashar, Vishal Singh, Saumitra Dwivedi, Monendra Meena, Rajesh Kumar, Suraj Kumar
+• Official Email: internwellclub@gmail.com
 `,
       apply: () => {
         setTimeout(() => {
           if (window.openInductionModal) window.openInductionModal();
-        }, 300);
-        return `<span style="color:#00f5a0">✓ Opening InternWell Induction Form...</span>`;
+        }, 200);
+        return `<span style="color:#10b981">✓ Opening InternWell Induction Form...</span>`;
       },
       contact: () => `
-[COMMUNICATION CHANNELS]
-• Official Email: <a href="mailto:internwellclub@gmail.com" style="color:#00f2fe; text-decoration:underline;">internwellclub@gmail.com</a>
-• Instagram: <a href="https://www.instagram.com/internwell.sliet" target="_blank" style="color:#00f2fe; text-decoration:underline;">@internwell.sliet</a>
-• Location: SLIET Longowal, Sangrur, Punjab - 148106
+[OFFICIAL CONTACT]
+• Email: <a href="mailto:internwellclub@gmail.com" style="color:#38bdf8; text-decoration:underline;">internwellclub@gmail.com</a>
+• Instagram: <a href="https://www.instagram.com/internwell.sliet" target="_blank" style="color:#38bdf8; text-decoration:underline;">@internwell.sliet</a>
+• Campus: SLIET Longowal, Sangrur, Punjab - 148106
 `,
       clear: () => {
         this.body.innerHTML = '';
         return null;
-      },
-      matrix: () => {
-        if (window.startMatrixRain) window.startMatrixRain();
-        return `<span style="color:#00f5a0">⚡ Neural Matrix Digital Rain Initialized. Press ESC or click Exit to return.</span>`;
-      },
-      sudo: () => `<span style="color:#ff5f56">Permission denied: You are already in superuser student mode! 😉</span>`
+      }
     };
 
     this.initListeners();
@@ -133,7 +123,6 @@ Sant Longowal Institute of Engineering & Technology (SLIET)
       }
     });
 
-    // Handle Quick Hint Pill clicks
     document.querySelectorAll('.terminal-hint-pill').forEach((pill) => {
       pill.addEventListener('click', () => {
         const cmd = pill.getAttribute('data-cmd') || pill.textContent.trim();
@@ -146,34 +135,19 @@ Sant Longowal Institute of Engineering & Technology (SLIET)
   executeCommand(cmdLine) {
     const parts = cmdLine.toLowerCase().split(' ');
     const mainCmd = parts[0];
-    const arg = parts[1];
 
-    // Print command user typed
     const promptLine = document.createElement('div');
     promptLine.className = 'terminal-output-line';
-    promptLine.innerHTML = `<span style="color:#00f2fe">guest@internwell:~$</span> ${cmdLine}`;
+    promptLine.innerHTML = `<span style="color:#38bdf8">guest@internwell:~$</span> ${cmdLine}`;
     this.body.appendChild(promptLine);
 
-    // 3D custom command handler
-    if (mainCmd === '3d') {
-      if (['core', 'grid', 'constellation'].includes(arg) && window.techScene) {
-        window.techScene.setMode(arg);
-        this.printOutput(`3D Scene mode switched to: <span style="color:#00f2fe">${arg}</span>`);
-      } else {
-        this.printOutput(`Usage: 3d [core | grid | constellation]`, 'error');
-      }
-      this.scrollToBottom();
-      return;
-    }
-
-    // Standard commands
     if (this.commands[mainCmd]) {
       const result = this.commands[mainCmd]();
       if (result !== null) {
         this.printOutput(result);
       }
     } else {
-      this.printOutput(`Command not recognized: "${mainCmd}". Type <span style="color:#00f2fe">help</span> for command list.`, 'error');
+      this.printOutput(`Command not recognized: "${mainCmd}". Type <span style="color:#38bdf8">help</span> for list.`, 'error');
     }
 
     this.scrollToBottom();

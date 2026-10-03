@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Events & Hackathons | InternWell SLIET</title>
+  
+  <meta name="description" content="Explore official events, hackathons, and seminars by InternWell SLIET: Coding Spardha, IW Talks, I-MAT, and resume review bootcamps.">
+  <meta name="theme-color" content="#0a0f1d">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/components.css">
+
+  <style>
+    .events-header-section {
+      padding: 140px 0 50px;
+      text-align: center;
+      position: relative;
+    }
+    .events-filter-bar {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 36px 0 48px;
+    }
+    .filter-btn {
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      background: rgba(18, 27, 43, 0.6);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--blue-primary);
+      border-color: var(--blue-primary);
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.35);
+    }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 32px;
+      margin-bottom: 80px;
+    }
+    @media (max-width: 640px) {
+      .events-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .event-card {
+      background: var(--bg-glass-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-smooth);
+    }
+    .event-card:hover {
+      border-color: var(--blue-primary);
+      transform: translateY(-6px);
+      box-shadow: 0 16px 36px -10px rgba(37, 99, 235, 0.25);
+    }
+    .event-banner-box {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+      background: #0f172a;
+    }
+    .event-banner-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-slow);
+    }
+    .event-card:hover .event-banner-box img {
+      transform: scale(1.05);
+    }
+    .event-status-tag {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .event-status-tag.upcoming {
+      background: rgba(16, 185, 129, 0.9);
+      color: #ffffff;
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+    }
+    .event-status-tag.past {
+      background: rgba(10, 15, 24, 0.85);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .event-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+    .event-category {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      color: var(--blue-primary);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .event-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+    .event-meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .event-meta-row span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .event-meta-row i {
+      color: var(--blue-primary);
+      width: 16px;
+    }
+    .event-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .event-tags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: auto;
+      margin-bottom: 20px;
+    }
+    .event-tag-pill {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-muted);
+    }
+    .event-cta-btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .event-cta-btn.primary {
+      background: var(--blue-primary);
+      color: #ffffff;
+    }
+    .event-cta-btn.primary:hover {
+      background: #1d4ed8;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+    }
+    .event-cta-btn.secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+    }
+    .event-cta-btn.secondary:hover {
+      border-color: var(--blue-primary);
+      color: #ffffff;
+    }
+    .edit-tip-banner {
+      background: rgba(37, 99, 235, 0.1);
+      border: 1px solid rgba(37, 99, 235, 0.3);
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      max-width: 820px;
+      margin: 0 auto 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 0.88rem;
+      color: #bfdbfe;
+    }
+    .edit-tip-banner code {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar scrolled">
+    <div class="container navbar-container">
+      <a href="./index.html" class="brand-wrapper">
+        <img src="./assets/images/logo.png" alt="InternWell SLIET Logo" class="brand-logo-img">
+        <div class="brand-text">
+          <div class="brand-name">
+            INTERNWELL <span class="brand-badge">SLIET</span>
+          </div>
+          <span class="brand-subtext">EVENTS & HACKATHONS</span>
+        </div>
+      </a>
+
+      <ul class="nav-menu">
+        <li><a href="./index.html#hero" class="nav-link">Home</a></li>
+        <li><a href="./index.html#about" class="nav-link">About</a></li>
+        <li><a href="./index.html#domains" class="nav-link">Domains</a></li>
+        <li><a href="./events.html" class="nav-link active">Events</a></li>
+        <li><a href="./index.html#team" class="nav-link">Team</a></li>
+        <li><a href="./index.html#faq" class="nav-link">FAQ</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <a href="./index.html#induction-modal" class="btn-cyber-primary">
+          <i class="fa-solid fa-bolt"></i> Join Club
+        </a>
+        <button class="mobile-nav-toggle" aria-label="Toggle Menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Events Header -->
+  <section class="events-header-section">
+    <div class="container">
+      <div class="section-tag">
+        <span class="dot"></span>
+        <span>CAMPUS CALENDAR</span>
+      </div>
+      <h1 class="section-title">
+        Official Events & <span class="highlight">Hackathons</span>
+      </h1>
+      <p class="section-desc" style="margin: 0 auto;">
+        From high-stakes coding arenas like Coding Spardha to career guidance in IW Talks and comprehensive internship bootcamps.
+      </p>
+
+      <!-- Edit Instruction for Coordinators -->
+      <div class="edit-tip-banner">
+        <i class="fa-solid fa-code" style="font-size: 1.4rem; color: #38bdf8;"></i>
+        <div>
+          <strong>Club Coordinator Note:</strong> To add or edit events, simply update the array inside <code>js/events-data.js</code>. No HTML editing required!
+        </div>
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="events-filter-bar">
+        <button class="filter-btn active" data-filter="all">All Events</button>
+        <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+        <button class="filter-btn" data-filter="hackathon">Hackathons</button>
+        <button class="filter-btn" data-filter="seminar">IW Talks</button>
+        <button class="filter-btn" data-filter="past">Past Events</button>
+      </div>
+
+      <!-- Events Dynamic Grid -->
+      <div class="events-grid" id="events-grid-container">
+        <!-- Rendered by JavaScript via js/events-data.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Event Detail Modal -->
+  <div id="event-detail-modal" class="modal-overlay">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="event-modal-close" aria-label="Close modal">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <span class="section-tag" id="modal-event-category">EVENT DETAILS</span>
+      <h3 class="modal-title" id="modal-event-title" style="margin-top: 8px;">Event Title</h3>
+      
+      <div class="event-meta-row" style="margin: 16px 0; border: none; padding: 0;">
+        <span id="modal-event-date"><i class="fa-regular fa-calendar"></i> Date</span>
+        <span id="modal-event-venue"><i class="fa-solid fa-location-dot"></i> Venue</span>
+        <span id="modal-event-time"><i class="fa-regular fa-clock"></i> Time</span>
+      </div>
+
+      <div style="border-radius: var(--radius-md); overflow: hidden; margin-bottom: 20px; max-height: 240px;">
+        <img id="modal-event-image" src="./assets/images/hackathon.jpg" alt="Event Banner" style="width: 100%; height: 240px; object-fit: cover;">
+      </div>
+
+      <p id="modal-event-description" style="color: var(--text-secondary); line-height: 1.8; margin-bottom: 24px;">
+        Detailed description...
+      </p>
+
+      <div class="event-tags-wrap" id="modal-event-tags"></div>
+
+      <a id="modal-event-register-btn" href="./index.html#induction-modal" class="btn-cyber-primary" style="width: 100%; justify-content: center;">
+        Participate / Register
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>
+          <a href="./index.html" style="color: var(--blue-primary); font-weight: 600;">← Return to Main Portal</a>
+        </div>
+        <div>
+          Official Club: <strong>InternWell SLIET</strong> • Sant Longowal Institute of Engineering & Technology
+        </div>
+        <div>
+          <a href="https://www.instagram.com/internwell.sliet" target="_blank" style="color: var(--text-secondary);">
+            <i class="fa-brands fa-instagram"></i> @internwell.sliet
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="./js/events-data.js"></script>
+  <script>
+    // Render and Filter Events
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('events-grid-container');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+
+      function renderEvents(filter = 'all') {
+        const events = getEvents(filter);
+        container.innerHTML = '';
+
+        if (events.length === 0) {
+          container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-secondary);">
+              <i class="fa-regular fa-calendar-xmark" style="font-size: 2.5rem; margin-bottom: 12px; color: var(--blue-primary);"></i>
+              <p>No events found for this filter category.</p>
+            </div>
+          `;
+          return;
+        }
+
+        events.forEach((ev) => {
+          const card = document.createElement('div');
+          card.className = 'event-card';
+          card.innerHTML = `
+            <div class="event-banner-box">
+              <img src="${ev.image}" alt="${ev.title}" onerror="this.src='./assets/images/hackathon.jpg'">
+              <span class="event-status-tag ${ev.status.toLowerCase()}">
+                ${ev.status === 'Upcoming' ? '● UPCOMING' : 'PAST EVENT'}
+              </span>
+            </div>
+            <div class="event-body">
+              <span class="event-category">${ev.category}</span>
+              <h3 class="event-title">${ev.title}</h3>
+              
+              <div class="event-meta-row">
+                <span><i class="fa-regular fa-calendar"></i> ${ev.date}</span>
+                <span><i class="fa-solid fa-location-dot"></i> ${ev.venue}</span>
+              </div>
+
+              <p class="event-desc">${ev.shortDesc}</p>
+
+              <div class="event-tags-wrap">
+                ${ev.tags.map(t => `<span class="event-tag-pill">${t}</span>`).join('')}
+              </div>
+
+              <button class="event-cta-btn ${ev.status.toLowerCase() === 'upcoming' ? 'primary' : 'secondary'}" data-id="${ev.id}">
+                ${ev.registrationText || 'View Details'} <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        // Attach modal trigger to buttons
+        document.querySelectorAll('.event-cta-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const evId = btn.getAttribute('data-id');
+            openEventModal(evId);
+          });
+        });
+      }
+
+      // Filter button handlers
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filter = btn.getAttribute('data-filter');
+          renderEvents(filter);
+        });
+      });
+
+      // Initial Render
+      renderEvents('all');
+
+      // Modal Handlers
+      const modal = document.getElementById('event-detail-modal');
+      const closeBtn = document.getElementById('event-modal-close');
+
+      function openEventModal(eventId) {
+        const ev = INTERNWELL_EVENTS.find(e => e.id === eventId);
+        if (!ev) return;
+
+        document.getElementById('modal-event-category').textContent = ev.category.toUpperCase();
+        document.getElementById('modal-event-title').textContent = ev.title;
+        document.getElementById('modal-event-date').innerHTML = `<i class="fa-regular fa-calendar"></i> ${ev.date}`;
+        document.getElementById('modal-event-venue').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${ev.venue}`;
+        document.getElementById('modal-event-time').innerHTML = `<i class="fa-regular fa-clock"></i> ${ev.time}`;
+        document.getElementById('modal-event-image').src = ev.image;
+        document.getElementById('modal-event-description').textContent = ev.fullDesc;
+
+        const tagsContainer = document.getElementById('modal-event-tags');
+        tagsContainer.innerHTML = ev.tags.map(t => `<span class="event-tag-pill">${t}</span>`).join('');
+
+        const regBtn = document.getElementById('modal-event-register-btn');
+        if (ev.status.toLowerCase() === 'upcoming') {
+          regBtn.style.display = 'inline-flex';
+          regBtn.href = ev.registrationLink || './index.html#induction-modal';
+          regBtn.textContent = ev.registrationText || 'Register Now';
+        } else {
+          regBtn.style.display = 'none';
+        }
+
+        modal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          modal.classList.remove('open');
+          document.body.style.overflow = 'auto';
+        });
+      }
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.classList.remove('open');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
