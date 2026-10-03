@@ -20,7 +20,7 @@ class SlietDroneIntro {
     if (!this.overlay) return;
 
     this.isCompleted = false;
-    this.totalDurationMs = 4500; // 4.5 seconds
+    this.totalDurationMs = 4000; // 4.0 seconds
     this.startTime = null;
     this.rafId = null;
 
