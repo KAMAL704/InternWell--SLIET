@@ -101,10 +101,11 @@ function initRegistrationSystem() {
 
       if (supabase && window.isSupabaseConfigured && window.isSupabaseConfigured()) {
         // --- PRODUCTION SUPABASE CLOUD SUBMISSION ---
-        const { data, error } = await supabase
+        // Note: Do not chain .select() here so PostgREST uses return=minimal
+        // and does not require SELECT privileges for anonymous public visitors
+        const { error } = await supabase
           .from('registrations')
-          .insert([payload])
-          .select();
+          .insert([payload]);
 
         if (error) {
           handleSubmissionError(error);
