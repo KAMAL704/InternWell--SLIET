@@ -505,3 +505,347 @@ body.intro-revealing .hero-cta-group {
 .footer-admin-link:hover {
   color: var(--blue-light);
 }
+
+/* ==========================================================================
+   STUDENT PROFILE DOSSIER & INDUCTIONS DASHBOARD
+   ========================================================================== */
+.student-profile-card {
+  max-width: 660px;
+  background: #0b1120;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.85), 0 0 40px rgba(56, 189, 248, 0.1);
+  padding: 28px;
+}
+
+.profile-header-badge {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e3a8a, #0284c7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+  border: 2px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+  text-transform: uppercase;
+}
+
+.profile-verified-check {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 22px;
+  height: 22px;
+  background: #10b981;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  border: 2px solid #0b1120;
+}
+
+.profile-title-block {
+  flex: 1;
+}
+
+.profile-student-name {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.profile-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.profile-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  background: rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+}
+
+@media (max-width: 580px) {
+  .profile-telemetry-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+.telemetry-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetry-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.telemetry-val {
+  font-size: 0.95rem;
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 18px 0;
+}
+
+.profile-section-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blue-light);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-details-table {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 16px;
+}
+
+@media (max-width: 580px) {
+  .profile-details-table {
+    grid-template-columns: 1fr;
+  }
+}
+
+.profile-detail-row {
+  display: flex;
+  flex-direction: column;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.profile-detail-row .p-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.profile-detail-row .p-value {
+  font-size: 0.88rem;
+  color: #f1f5f9;
+  word-break: break-all;
+}
+
+.profile-detail-row .p-value a {
+  color: var(--blue-light);
+  text-decoration: underline;
+}
+
+.profile-tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 100px;
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #bae6fd;
+}
+
+/* Roadmap Track */
+.roadmap-track {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  padding-left: 12px;
+}
+
+.roadmap-track::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.roadmap-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.roadmap-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.roadmap-step.step-done .roadmap-dot {
+  background: #059669;
+  border-color: #10b981;
+  color: #fff;
+}
+
+.roadmap-step.step-active .roadmap-dot {
+  background: #0284c7;
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.roadmap-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.roadmap-content strong {
+  font-size: 0.88rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.roadmap-content span {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.profile-community-card {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(56, 189, 248, 0.12));
+  border: 1px solid rgba(56, 189, 248, 0.2);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.community-text strong {
+  font-size: 0.9rem;
+  color: #fff;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.community-text p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 380px;
+}
+
+.community-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Print Slip Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #student-profile-modal,
+  #student-profile-modal * {
+    visibility: visible;
+  }
+  #student-profile-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #fff !important;
+    display: block !important;
+  }
+  .student-profile-card {
+    background: #fff !important;
+    color: #000 !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+  }
+  .student-profile-card * {
+    color: #000 !important;
+  }
+  .modal-close-btn,
+  .profile-footer-actions,
+  .community-actions {
+    display: none !important;
+  }
+}

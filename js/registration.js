@@ -1,11 +1,12 @@
 /**
- * INTERNWELL SLIET - Registration Controller & Supabase Integration
+ * INTERNWELL SLIET - Registration & Student Profile Dashboard Controller
  * Handles student registration, field validation, duplicate detection,
- * loading states, and database submission with graceful demo fallback.
+ * cloud database submission, and interactive Student Profile Dossier.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
   initRegistrationSystem();
+  initStudentProfileSystem();
 });
 
 function initRegistrationSystem() {
@@ -15,7 +16,7 @@ function initRegistrationSystem() {
 
   if (!form) return;
 
-  // Real-time input sanitization & visual feedback
+  // Real-time input sanitization
   const emailInput = document.getElementById('applicant-email');
   const phoneInput = document.getElementById('applicant-phone');
   const rollInput = document.getElementById('applicant-roll');
@@ -34,7 +35,6 @@ function initRegistrationSystem() {
 
   if (phoneInput) {
     phoneInput.addEventListener('input', () => {
-      // Allow only numbers and leading +
       phoneInput.value = phoneInput.value.replace(/[^\d+]/g, '');
     });
   }
@@ -90,7 +90,7 @@ function initRegistrationSystem() {
       internship_details: internshipDetails,
       internship_duration: internshipDuration,
       profile_links: profileLinks,
-      resume_url: profileLinks, // also stored for resume reference
+      resume_url: profileLinks,
       applicant_note: applicantNote,
       status: 'Pending',
       created_at: new Date().toISOString()
@@ -101,8 +101,7 @@ function initRegistrationSystem() {
 
       if (supabase && window.isSupabaseConfigured && window.isSupabaseConfigured()) {
         // --- PRODUCTION SUPABASE CLOUD SUBMISSION ---
-        // Note: Do not chain .select() here so PostgREST uses return=minimal
-        // and does not require SELECT privileges for anonymous public visitors
+        // Using pure insert without .select() to strictly adhere to public insert-only RLS policy
         const { error } = await supabase
           .from('registrations')
           .insert([payload]);
@@ -112,11 +111,11 @@ function initRegistrationSystem() {
           return;
         }
 
-        handleSubmissionSuccess(fullName);
+        handleSubmissionSuccess(fullName, false, payload);
       } else {
         // --- DEMO / LOCAL STORAGE MODE (Zero-configuration fallback) ---
         await submitToLocalStorage(payload);
-        handleSubmissionSuccess(fullName, true);
+        handleSubmissionSuccess(fullName, true, payload);
       }
     } catch (err) {
       console.error('[Registration Error]', err);
@@ -215,16 +214,18 @@ function initRegistrationSystem() {
     }
   }
 
-  function handleSubmissionSuccess(fullName, isDemo = false) {
+  function handleSubmissionSuccess(fullName, isDemo = false, payload = null) {
     form.reset();
 
-    const successMsg = isDemo
-      ? `Registration successful! Application recorded for ${fullName}. (Demo Mode: connect Supabase in js/supabase-config.js for live cloud DB)`
-      : `Registration successful! Welcome to InternWell SLIET, ${fullName}!`;
+    // 1. Cache registered applicant profile locally
+    if (payload) {
+      localStorage.setItem('internwell_student_profile', JSON.stringify(payload));
+    }
 
+    const successMsg = `Registration successful! Welcome to InternWell SLIET, ${fullName}!`;
     showAlert(`✨ ${successMsg}`, 'success');
 
-    // Trigger celebration effects
+    // 2. Trigger celebration effects
     if (typeof window.triggerConfetti === 'function') {
       window.triggerConfetti();
     }
@@ -232,16 +233,25 @@ function initRegistrationSystem() {
       window.cyberAudio.playSuccess();
     }
     if (typeof window.showToast === 'function') {
-      window.showToast(`✨ Registration Successful! Welcome, ${fullName}!`);
+      window.showToast(`✨ Registration Successful! Welcome, ${fullName}! Opening your profile...`);
     }
 
-    // Auto-close modal after student views confirmation
+    // 3. Update top navigation profile badge
+    if (typeof window.updateProfileNavState === 'function') {
+      window.updateProfileNavState();
+    }
+
+    // 4. Smoothly transition from registration form to Student Profile Dossier
     setTimeout(() => {
       if (typeof window.closeInductionModal === 'function') {
         window.closeInductionModal();
       }
       hideAlert();
-    }, 2400);
+
+      if (payload && typeof window.openStudentProfileModal === 'function') {
+        window.openStudentProfileModal(payload);
+      }
+    }, 1100);
   }
 
   function showAlert(message, type = 'error') {
@@ -270,11 +280,10 @@ function initRegistrationSystem() {
 
   // Fallback demo storage in localStorage
   async function submitToLocalStorage(payload) {
-    await new Promise((r) => setTimeout(r, 600)); // simulate brief network latency
+    await new Promise((r) => setTimeout(r, 600));
     const key = 'iw_demo_registrations';
     const existing = JSON.parse(localStorage.getItem(key) || '[]');
 
-    // Duplicate check
     const isDupRoll = existing.some((r) => r.roll_no.toLowerCase() === payload.roll_no.toLowerCase());
     const isDupEmail = existing.some((r) => r.email.toLowerCase() === payload.email.toLowerCase());
 
@@ -289,5 +298,322 @@ function initRegistrationSystem() {
     existing.unshift(payload);
     localStorage.setItem(key, JSON.stringify(existing));
     return payload;
+  }
+}
+
+/**
+ * ============================================================================
+ * STUDENT PROFILE DOSSIER & APPLICATION TRACKER CONTROLLER
+ * ============================================================================
+ */
+function initStudentProfileSystem() {
+  const profileModal = document.getElementById('student-profile-modal');
+  const closeProfileBtn = document.getElementById('profile-modal-close-btn');
+  const doneProfileBtn = document.getElementById('btn-done-profile-view');
+  const printProfileBtn = document.getElementById('btn-print-profile-slip');
+
+  const navProfileBtn = document.getElementById('btn-my-profile-nav');
+  const navProfileText = document.getElementById('nav-profile-name-text');
+  const mobileProfileItem = document.getElementById('mobile-my-profile-item');
+  const mobileProfileLink = document.getElementById('mobile-my-profile-link');
+
+  const navTrackBtn = document.getElementById('btn-track-application-nav');
+  const lookupModal = document.getElementById('lookup-application-modal');
+  const lookupCloseBtn = document.getElementById('lookup-modal-close-btn');
+  const lookupForm = document.getElementById('lookup-application-form');
+  const lookupAlert = document.getElementById('lookup-status-alert');
+
+  // 1. Initial Profile State Check
+  updateProfileNavState();
+
+  // 2. Open Profile Modal function
+  window.openStudentProfileModal = function(profile) {
+    if (!profileModal || !profile) return;
+
+    // Set Initials
+    const initials = (profile.full_name || 'IW')
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'IW';
+
+    const avatarEl = document.getElementById('profile-avatar-initials');
+    if (avatarEl) avatarEl.textContent = initials;
+
+    // Student Basic Info
+    const nameEl = document.getElementById('profile-student-name');
+    if (nameEl) nameEl.textContent = profile.full_name || 'SLIET Applicant';
+
+    const rollEl = document.getElementById('profile-roll-badge');
+    if (rollEl) rollEl.textContent = `ROLL: ${profile.roll_no || 'N/A'}`;
+
+    // Status Pill
+    const statusPill = document.getElementById('profile-status-pill');
+    if (statusPill) {
+      const status = profile.status || 'Pending';
+      const statusClass = status.toLowerCase();
+      statusPill.className = `status-pill ${statusClass}`;
+      statusPill.innerHTML = `<i class="fa-solid ${getStatusIcon(status)}"></i> ${status}`;
+    }
+
+    // Telemetry stats
+    const deptEl = document.getElementById('profile-dept-val');
+    if (deptEl) deptEl.textContent = profile.department || 'N/A';
+
+    const yearEl = document.getElementById('profile-year-val');
+    if (yearEl) yearEl.textContent = profile.year_semester || 'N/A';
+
+    const domainEl = document.getElementById('profile-domain-val');
+    if (domainEl) domainEl.textContent = profile.domain_interest || 'General';
+
+    // Details Table
+    const emailEl = document.getElementById('profile-email-val');
+    if (emailEl) emailEl.textContent = profile.email || 'N/A';
+
+    const phoneEl = document.getElementById('profile-phone-val');
+    if (phoneEl) phoneEl.textContent = profile.phone || 'N/A';
+
+    const durationEl = document.getElementById('profile-duration-val');
+    if (durationEl) durationEl.textContent = profile.internship_duration || 'Standard Session';
+
+    const linksEl = document.getElementById('profile-links-val');
+    if (linksEl) {
+      if (profile.profile_links) {
+        linksEl.innerHTML = `<a href="${escapeHtml(profile.profile_links)}" target="_blank" rel="noopener noreferrer">${escapeHtml(profile.profile_links)} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.72rem;"></i></a>`;
+      } else {
+        linksEl.textContent = 'None provided';
+      }
+    }
+
+    // Skills Tags
+    const skillsContainer = document.getElementById('profile-skills-tags');
+    if (skillsContainer) {
+      const skillsStr = profile.skills || '';
+      if (skillsStr.trim()) {
+        const skillsList = skillsStr.split(/[,;]+/).map((s) => s.trim()).filter(Boolean);
+        skillsContainer.innerHTML = skillsList
+          .map((s) => `<span class="skill-tag-pill">${escapeHtml(s)}</span>`)
+          .join('');
+      } else {
+        skillsContainer.innerHTML = `<span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">No specific skills recorded</span>`;
+      }
+    }
+
+    // Open Modal
+    profileModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.cyberAudio && typeof window.cyberAudio.playBlip === 'function') {
+      window.cyberAudio.playBlip();
+    }
+  };
+
+  // Close Profile Modal
+  window.closeStudentProfileModal = function() {
+    if (profileModal) {
+      profileModal.classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+  };
+
+  if (closeProfileBtn) {
+    closeProfileBtn.addEventListener('click', window.closeStudentProfileModal);
+  }
+  if (doneProfileBtn) {
+    doneProfileBtn.addEventListener('click', window.closeStudentProfileModal);
+  }
+  if (profileModal) {
+    profileModal.addEventListener('click', (e) => {
+      if (e.target === profileModal) window.closeStudentProfileModal();
+    });
+  }
+
+  // Print Slip
+  if (printProfileBtn) {
+    printProfileBtn.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // Update Navbar Button State
+  window.updateProfileNavState = function() {
+    const cachedStr = localStorage.getItem('internwell_student_profile');
+    if (!cachedStr) return;
+
+    try {
+      const profile = JSON.parse(cachedStr);
+      if (profile && profile.full_name) {
+        const firstName = profile.full_name.split(' ')[0] || 'My';
+
+        if (navProfileBtn && navProfileText) {
+          navProfileText.textContent = `${firstName} (Profile)`;
+          navProfileBtn.style.display = 'inline-flex';
+        }
+        if (mobileProfileItem) {
+          mobileProfileItem.style.display = 'block';
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to parse cached profile:', e);
+    }
+  };
+
+  // Click on "My Profile" button in navbar
+  if (navProfileBtn) {
+    navProfileBtn.addEventListener('click', () => {
+      const cached = localStorage.getItem('internwell_student_profile');
+      if (cached) {
+        try {
+          const profile = JSON.parse(cached);
+          window.openStudentProfileModal(profile);
+          return;
+        } catch (e) {}
+      }
+      // If no profile cached, open lookup modal
+      openLookupModal();
+    });
+  }
+
+  if (mobileProfileLink) {
+    mobileProfileLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const cached = localStorage.getItem('internwell_student_profile');
+      if (cached) {
+        try {
+          const profile = JSON.parse(cached);
+          window.openStudentProfileModal(profile);
+          return;
+        } catch (e) {}
+      }
+      openLookupModal();
+    });
+  }
+
+  // Track Application Button in Navbar
+  if (navTrackBtn) {
+    navTrackBtn.addEventListener('click', () => {
+      openLookupModal();
+    });
+  }
+
+  function openLookupModal() {
+    if (!lookupModal) return;
+    hideLookupAlert();
+    lookupModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.cyberAudio && typeof window.cyberAudio.playHover === 'function') {
+      window.cyberAudio.playHover();
+    }
+  }
+
+  function closeLookupModal() {
+    if (lookupModal) {
+      lookupModal.classList.remove('open');
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  if (lookupCloseBtn) {
+    lookupCloseBtn.addEventListener('click', closeLookupModal);
+  }
+  if (lookupModal) {
+    lookupModal.addEventListener('click', (e) => {
+      if (e.target === lookupModal) closeLookupModal();
+    });
+  }
+
+  // 3. Handle Application Lookup Submission
+  if (lookupForm) {
+    lookupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideLookupAlert();
+
+      const queryInput = document.getElementById('lookup-query');
+      const submitBtn = document.getElementById('btn-lookup-submit');
+      const query = (queryInput?.value || '').trim().toLowerCase();
+
+      if (!query) return;
+
+      // 1. Fast local check if user already registered on this device
+      const localStr = localStorage.getItem('internwell_student_profile');
+      if (localStr) {
+        try {
+          const localProfile = JSON.parse(localStr);
+          const rollMatch = localProfile.roll_no && localProfile.roll_no.toLowerCase() === query;
+          const emailMatch = localProfile.email && localProfile.email.toLowerCase() === query;
+          if (rollMatch || emailMatch) {
+            closeLookupModal();
+            window.openStudentProfileModal(localProfile);
+            return;
+          }
+        } catch (err) {}
+      }
+
+      // 2. Query Supabase RPC `check_registration_status`
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking Database...';
+
+      try {
+        const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+        let foundProfile = null;
+
+        if (supabase && window.isSupabaseConfigured && window.isSupabaseConfigured()) {
+          const { data, error } = await supabase.rpc('check_registration_status', {
+            search_query: query
+          });
+
+          if (!error && data && data.length > 0) {
+            foundProfile = data[0];
+          }
+        }
+
+        if (foundProfile) {
+          localStorage.setItem('internwell_student_profile', JSON.stringify(foundProfile));
+          window.updateProfileNavState();
+          closeLookupModal();
+          window.openStudentProfileModal(foundProfile);
+        } else {
+          showLookupAlert('No registered application found matching this Roll Number or Email. Please verify your details or submit a new application.');
+        }
+      } catch (err) {
+        console.error('[Lookup Error]', err);
+        showLookupAlert('Network error during lookup. Please try again.');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> View Application Profile';
+      }
+    });
+  }
+
+  function showLookupAlert(msg) {
+    if (!lookupAlert) return;
+    lookupAlert.textContent = msg;
+    lookupAlert.style.display = 'flex';
+  }
+
+  function hideLookupAlert() {
+    if (lookupAlert) {
+      lookupAlert.style.display = 'none';
+      lookupAlert.textContent = '';
+    }
+  }
+
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function getStatusIcon(status) {
+    switch ((status || '').toLowerCase()) {
+      case 'approved': return 'fa-circle-check';
+      case 'rejected': return 'fa-circle-xmark';
+      case 'completed': return 'fa-flag-checkered';
+      default: return 'fa-clock';
+    }
   }
 }

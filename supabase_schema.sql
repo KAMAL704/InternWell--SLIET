@@ -106,7 +106,56 @@ TO authenticated
 USING (true);
 
 -- ============================================================================
--- 5. Optional Sample Data (Uncomment to test Admin Dashboard with mock records)
+-- 5. Public Self-Service Application Status Lookup (Secure RPC)
+-- Allows students to view their own application profile and status without exposing
+-- other applicants' data to public reading.
+-- ============================================================================
+CREATE OR REPLACE FUNCTION public.check_registration_status(search_query TEXT)
+RETURNS TABLE (
+    full_name TEXT,
+    roll_no TEXT,
+    email TEXT,
+    phone TEXT,
+    department TEXT,
+    year_semester TEXT,
+    domain_interest TEXT,
+    skills TEXT,
+    internship_details TEXT,
+    internship_duration TEXT,
+    profile_links TEXT,
+    status TEXT,
+    created_at TIMESTAMPTZ
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        r.full_name,
+        r.roll_no,
+        r.email,
+        r.phone,
+        r.department,
+        r.year_semester,
+        r.domain_interest,
+        r.skills,
+        r.internship_details,
+        r.internship_duration,
+        r.profile_links,
+        r.status,
+        r.created_at
+    FROM public.registrations r
+    WHERE lower(trim(r.email)) = lower(trim(search_query))
+       OR lower(trim(r.roll_no)) = lower(trim(search_query))
+    LIMIT 1;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.check_registration_status(TEXT) TO anon, authenticated;
+
+-- ============================================================================
+-- 6. Optional Sample Data (Uncomment to test Admin Dashboard with mock records)
 -- ============================================================================
 /*
 INSERT INTO public.registrations 

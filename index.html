@@ -109,6 +109,11 @@
         <li><a href="#projects" class="nav-link">Projects</a></li>
         <li><a href="#team" class="nav-link">Team</a></li>
         <li><a href="#faq" class="nav-link">FAQ</a></li>
+        <li id="mobile-my-profile-item" style="display: none;">
+          <a href="#profile" id="mobile-my-profile-link" class="nav-link" style="color: var(--blue-light);">
+            <i class="fa-solid fa-id-card"></i> <span id="mobile-profile-name-text">My Profile Dossier</span>
+          </a>
+        </li>
         <li class="mobile-menu-cta">
           <button class="btn-cyber-primary btn-open-induction" style="width: 100%; justify-content: center; margin-top: 10px;">
             <i class="fa-solid fa-bolt"></i> Join Club
@@ -124,6 +129,16 @@
             <span></span><span></span><span></span><span></span>
           </div>
           <span id="sound-status-text">SFX: ON</span>
+        </button>
+
+        <!-- Track / Look Up Application -->
+        <button id="btn-track-application-nav" class="btn-action-view" style="padding: 7px 12px; font-size: 0.8rem;" title="Check Application Status">
+          <i class="fa-solid fa-magnifying-glass"></i> <span class="nav-track-text">Track Status</span>
+        </button>
+
+        <!-- Student Profile Quick Access (shown when registered) -->
+        <button id="btn-my-profile-nav" class="btn-action-view" style="display: none; padding: 7px 12px; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: var(--blue-light);" title="View Registered Profile & Application Status">
+          <i class="fa-solid fa-id-card"></i> <span id="nav-profile-name-text">My Profile</span>
         </button>
 
         <button class="btn-cyber-primary btn-open-induction nav-desktop-join-btn">
@@ -1013,6 +1028,181 @@
 
         <button type="submit" id="induction-submit-btn" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
           <i class="fa-solid fa-paper-plane"></i> Submit Application
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       STUDENT PROFILE & INDUCTIONS DASHBOARD MODAL
+       ========================================================================== -->
+  <div id="student-profile-modal" class="modal-overlay">
+    <div class="modal-card student-profile-card">
+      <button id="profile-modal-close-btn" class="modal-close-btn" type="button" aria-label="Close Profile">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Profile Header / ID Badge -->
+      <div class="profile-header-badge">
+        <div class="profile-avatar-wrap">
+          <div id="profile-avatar-initials" class="profile-avatar">IW</div>
+          <div class="profile-verified-check" title="Verified SLIET Applicant"><i class="fa-solid fa-check"></i></div>
+        </div>
+
+        <div class="profile-title-block">
+          <div class="section-tag" style="margin-bottom: 4px;">
+            <span class="dot"></span>
+            <span>APPLICANT DOSSIER // INDUCTIONS</span>
+          </div>
+          <h3 id="profile-student-name" class="profile-student-name">Student Name</h3>
+          <div class="profile-meta-row">
+            <span id="profile-roll-badge" class="badge-mono">ROLL: GCS-0000000</span>
+            <span id="profile-status-pill" class="status-pill pending">
+              <i class="fa-solid fa-clock"></i> Pending Review
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats / Telemetry Bar -->
+      <div class="profile-telemetry-grid">
+        <div class="telemetry-box">
+          <span class="telemetry-label">DEPARTMENT</span>
+          <strong id="profile-dept-val" class="telemetry-val">CSE</strong>
+        </div>
+        <div class="telemetry-box">
+          <span class="telemetry-label">SEMESTER</span>
+          <strong id="profile-year-val" class="telemetry-val">2nd Year</strong>
+        </div>
+        <div class="telemetry-box">
+          <span class="telemetry-label">SELECTED DOMAIN</span>
+          <strong id="profile-domain-val" class="telemetry-val" style="color: var(--blue-light);">Full-Stack</strong>
+        </div>
+      </div>
+
+      <!-- Application Details Section -->
+      <div class="profile-section">
+        <h4 class="profile-section-title"><i class="fa-solid fa-user-astronaut"></i> Applicant Profile</h4>
+        <div class="profile-details-table">
+          <div class="profile-detail-row">
+            <span class="p-label">Official Email:</span>
+            <span id="profile-email-val" class="p-value">student@sliet.ac.in</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="p-label">Phone / WhatsApp:</span>
+            <span id="profile-phone-val" class="p-value">+91 00000 00000</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="p-label">Availability / Duration:</span>
+            <span id="profile-duration-val" class="p-value">3 Months / Immediate</span>
+          </div>
+          <div class="profile-detail-row">
+            <span class="p-label">Portfolio / Resume:</span>
+            <span id="profile-links-val" class="p-value"><a href="#" target="_blank">View Links</a></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skills Section -->
+      <div class="profile-section">
+        <h4 class="profile-section-title"><i class="fa-solid fa-code"></i> Recorded Skills &amp; Tools</h4>
+        <div id="profile-skills-tags" class="profile-tags-container">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- Live Induction Tracker Roadmap -->
+      <div class="profile-section">
+        <h4 class="profile-section-title"><i class="fa-solid fa-timeline"></i> Induction Progression</h4>
+        <div class="roadmap-track">
+          <div class="roadmap-step step-done">
+            <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+            <div class="roadmap-content">
+              <strong>1. Application Submitted</strong>
+              <span>Dossier successfully collected &amp; stored in database.</span>
+            </div>
+          </div>
+          <div class="roadmap-step step-active">
+            <div class="roadmap-dot"><i class="fa-solid fa-spinner fa-spin"></i></div>
+            <div class="roadmap-content">
+              <strong>2. Domain Screening</strong>
+              <span>Domain leads review your skill matrix &amp; portfolio.</span>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-dot"><i class="fa-solid fa-comments"></i></div>
+            <div class="roadmap-content">
+              <strong>3. Interaction &amp; Mentorship Round</strong>
+              <span>Technical interaction &amp; alignment call with club coordinators.</span>
+            </div>
+          </div>
+          <div class="roadmap-step">
+            <div class="roadmap-dot"><i class="fa-solid fa-award"></i></div>
+            <div class="roadmap-content">
+              <strong>4. Welcome to InternWell SLIET</strong>
+              <span>Onboarding to active project sprints &amp; socio-startup teams.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Community Connect Card -->
+      <div class="profile-community-card">
+        <div class="community-text">
+          <strong><i class="fa-solid fa-bullhorn" style="color: var(--blue-light);"></i> Next Steps &amp; Community Circle</strong>
+          <p>Connect with the InternWell community for interview slots, sprint notifications, and hackathon alerts.</p>
+        </div>
+        <div class="community-actions">
+          <a href="https://www.instagram.com/internwell.sliet" target="_blank" class="btn-action-view" style="color: #ec4899; border-color: rgba(236,72,153,0.3);">
+            <i class="fa-brands fa-instagram"></i> Instagram
+          </a>
+          <a href="mailto:internwellclub@gmail.com" class="btn-action-view">
+            <i class="fa-solid fa-envelope"></i> Email Us
+          </a>
+        </div>
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="profile-footer-actions">
+        <button id="btn-print-profile-slip" type="button" class="btn-cyber-outline">
+          <i class="fa-solid fa-print"></i> Print / Save Slip
+        </button>
+        <button id="btn-done-profile-view" type="button" class="btn-cyber-primary">
+          <i class="fa-solid fa-arrow-right"></i> Continue to Website
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       TRACK / LOOKUP APPLICATION MODAL
+       ========================================================================== -->
+  <div id="lookup-application-modal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 460px;">
+      <button id="lookup-modal-close-btn" class="modal-close-btn" type="button" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="section-tag" style="margin-bottom: 8px;">
+        <span class="dot"></span>
+        <span>STATUS TRACKER</span>
+      </div>
+
+      <h3 class="modal-title">Track My Application</h3>
+      <p class="modal-subtitle">
+        Enter your College Roll Number or registered Email ID to view your induction status dossier.
+      </p>
+
+      <div id="lookup-status-alert" class="form-status-alert error" style="display: none;"></div>
+
+      <form id="lookup-application-form">
+        <div class="form-group">
+          <label class="form-label" for="lookup-query">Roll No or College Email</label>
+          <input type="text" id="lookup-query" class="form-input" placeholder="e.g. 23101234 or name@sliet.ac.in" required>
+        </div>
+
+        <button type="submit" id="btn-lookup-submit" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
+          <i class="fa-solid fa-magnifying-glass"></i> View Application Profile
         </button>
       </form>
     </div>
