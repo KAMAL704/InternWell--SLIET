@@ -89,21 +89,21 @@ FOR SELECT
 TO anon, authenticated
 USING (true);
 
--- Policy 3: Only Authenticated Users (Admins) can UPDATE registrations (status / notes)
+-- Policy 3: UPDATE registrations (status / notes)
 DROP POLICY IF EXISTS "Admins can update registrations" ON public.registrations;
 CREATE POLICY "Admins can update registrations"
 ON public.registrations
 FOR UPDATE
-TO authenticated
+TO anon, authenticated
 USING (true)
 WITH CHECK (true);
 
--- Policy 4: Only Authenticated Users (Admins) can DELETE registrations
+-- Policy 4: DELETE registrations
 DROP POLICY IF EXISTS "Admins can delete registrations" ON public.registrations;
 CREATE POLICY "Admins can delete registrations"
 ON public.registrations
 FOR DELETE
-TO authenticated
+TO anon, authenticated
 USING (true);
 
 -- ============================================================================

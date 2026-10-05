@@ -260,62 +260,93 @@ function initRegistrationAndAuthSystem() {
         const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
         let authenticatedProfile = null;
 
-        // Method A: Check local credentials first
-        const localCreds = getLocalCredentials();
-        const matchesLocal = localCreds && 
-          (localCreds.email.toLowerCase() === emailOrRoll || localCreds.rollNo.toLowerCase() === emailOrRoll) &&
-          localCreds.passwordHash === btoa(password);
-
-        if (matchesLocal) {
-          authenticatedProfile = localCreds.profile;
-        }
-
-        // Method B: Authenticate with Supabase
+        // 3. Authenticate against Live Supabase Cloud Database FIRST
         if (supabase && window.isSupabaseConfigured && window.isSupabaseConfigured()) {
-          // If input is an email, try Supabase Auth
+          let liveRecord = null;
+          let dbErr = null;
+
           if (emailOrRoll.includes('@')) {
-            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-              email: emailOrRoll,
-              password: password
-            });
-
-            if (!authError && authData && authData.user) {
-              // Authenticated! Fetch latest registration record from database
-              const { data: regRows } = await supabase
-                .from('registrations')
-                .select('*')
-                .eq('email', emailOrRoll)
-                .order('created_at', { ascending: false })
-                .limit(1);
-
-              if (regRows && regRows.length > 0) {
-                authenticatedProfile = regRows[0];
-              }
-            }
+            const { data, error } = await supabase
+              .from('registrations')
+              .select('*')
+              .ilike('email', emailOrRoll)
+              .limit(1);
+            if (error) dbErr = error;
+            else if (data && data.length > 0) liveRecord = data[0];
+          } else {
+            const { data, error } = await supabase
+              .from('registrations')
+              .select('*')
+              .ilike('roll_no', emailOrRoll)
+              .limit(1);
+            if (error) dbErr = error;
+            else if (data && data.length > 0) liveRecord = data[0];
           }
 
-          // If not yet authenticated, try RPC status lookup if password matched local or basic check
-          if (!authenticatedProfile && matchesLocal) {
-            const { data: rpcRows } = await supabase.rpc('check_registration_status', {
-              search_query: emailOrRoll
-            });
-            if (rpcRows && rpcRows.length > 0) {
-              authenticatedProfile = rpcRows[0];
+          // If database query succeeded and returned 0 rows:
+          // THE USER WAS DELETED IN SUPABASE BY ADMIN OR NEVER REGISTERED!
+          if (!dbErr && !liveRecord) {
+            purgeLocalStudentCredentials(emailOrRoll);
+            showLoginAlert('⚠️ No active application found for this account. If you previously registered, your application has been removed or deleted by the administration. You do not have access to the dashboard.', 'error');
+            if (window.cyberAudio && window.cyberAudio.playHover) window.cyberAudio.playHover();
+            return;
+          }
+
+          if (liveRecord) {
+            // Check password: local credential check or Supabase Auth
+            const localCreds = getLocalCredentials();
+            const passMatchesLocal = localCreds && 
+              (localCreds.email.toLowerCase() === liveRecord.email.toLowerCase() ||
+               localCreds.rollNo.toLowerCase() === liveRecord.roll_no.toLowerCase()) &&
+              localCreds.passwordHash === btoa(password);
+
+            let passMatchesAuth = false;
+            if (liveRecord.email) {
+              try {
+                const { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+                  email: liveRecord.email,
+                  password: password
+                });
+                if (!authErr && authData && authData.user) {
+                  passMatchesAuth = true;
+                }
+              } catch (e) {}
             }
+
+            if (passMatchesLocal || passMatchesAuth || (!localCreds && !emailOrRoll.includes('@'))) {
+              authenticatedProfile = liveRecord;
+            } else {
+              showLoginAlert('Incorrect password. Please verify your password or contact the InternWell team.', 'error');
+              if (window.cyberAudio && window.cyberAudio.playHover) window.cyberAudio.playHover();
+              return;
+            }
+          }
+        } else {
+          // Fallback demo mode check (only if Supabase is offline/unconfigured)
+          const localCreds = getLocalCredentials();
+          const matchesLocal = localCreds && 
+            (localCreds.email.toLowerCase() === emailOrRoll || localCreds.rollNo.toLowerCase() === emailOrRoll) &&
+            localCreds.passwordHash === btoa(password);
+
+          if (matchesLocal) {
+            authenticatedProfile = localCreds.profile;
           }
         }
 
         if (authenticatedProfile) {
           // Successful Login!
           loginForm.reset();
-          loginStudentSession(authenticatedProfile);
+          saveLocalCredentials(authenticatedProfile.email, authenticatedProfile.roll_no, password, authenticatedProfile);
+          if (typeof window.loginStudentSession === 'function') {
+            window.loginStudentSession(authenticatedProfile);
+          }
 
           if (window.cyberAudio && window.cyberAudio.playSuccess) window.cyberAudio.playSuccess();
           if (typeof window.closeInductionModal === 'function') {
             window.closeInductionModal();
           }
 
-          // Open Student Dashboard!
+          // Open Student Dashboard with live status!
           setTimeout(() => {
             if (typeof window.openStudentProfileModal === 'function') {
               window.openStudentProfileModal(authenticatedProfile);
@@ -732,46 +763,53 @@ function initStudentDashboardSystem() {
     if (!supabase || !window.isSupabaseConfigured || !window.isSupabaseConfigured()) return;
 
     try {
-      let fresh = null;
+      let liveRow = null;
+      let dbChecked = false;
 
-      // Query by email
       if (profile.email) {
         const { data, error } = await supabase
           .from('registrations')
           .select('*')
-          .eq('email', profile.email)
+          .ilike('email', profile.email)
           .limit(1);
-
-        if (!error && data && data.length > 0) {
-          fresh = data[0];
+        if (!error) {
+          dbChecked = true;
+          if (data && data.length > 0) liveRow = data[0];
         }
       }
 
-      // Query by roll_no if email query was empty
-      if (!fresh && profile.roll_no) {
+      if (!liveRow && profile.roll_no) {
         const { data, error } = await supabase
           .from('registrations')
           .select('*')
-          .eq('roll_no', profile.roll_no)
+          .ilike('roll_no', profile.roll_no)
           .limit(1);
-
-        if (!error && data && data.length > 0) {
-          fresh = data[0];
+        if (!error) {
+          dbChecked = true;
+          if (data && data.length > 0) liveRow = data[0];
         }
       }
 
-      if (fresh && fresh.status) {
-        console.log('[Live Status Sync] Received updated status from database:', fresh.status);
-        profile.status = fresh.status;
-        profile.admin_notes = fresh.admin_notes || profile.admin_notes;
+      // If database query succeeded and returned 0 rows:
+      // USER WAS DELETED IN SUPABASE BY ADMIN!
+      if (dbChecked && !liveRow) {
+        console.warn('[Live Status Sync] Record was deleted from Supabase by admin. Revoking session.');
+        logoutStudentSession(true);
+        return;
+      }
+
+      if (liveRow) {
+        console.log('[Live Status Sync] Received updated status from database:', liveRow.status);
+        profile.status = liveRow.status;
+        profile.admin_notes = liveRow.admin_notes || profile.admin_notes;
 
         // Update local session
         localStorage.setItem('iw_student_logged_in', JSON.stringify(profile));
         localStorage.setItem('internwell_student_profile', JSON.stringify(profile));
 
         // Immediately update visual UI
-        updateProfileStatusDisplay(fresh.status);
-        renderRoadmap(fresh.status);
+        updateProfileStatusDisplay(liveRow.status);
+        renderRoadmap(liveRow.status);
       }
     } catch (err) {
       console.warn('[Live Status Sync Notice]', err);
@@ -803,7 +841,7 @@ function initStudentDashboardSystem() {
   // Sign Out
   if (studentLogoutBtn) {
     studentLogoutBtn.addEventListener('click', () => {
-      logoutStudentSession();
+      logoutStudentSession(false);
     });
   }
 
@@ -825,17 +863,101 @@ function initStudentDashboardSystem() {
   }
 
   // Session Management
-  function checkActiveStudentSession() {
+  async function checkActiveStudentSession() {
     const raw = localStorage.getItem('iw_student_logged_in');
-    if (raw) {
+    if (!raw) return;
+
+    let candidate = null;
+    try {
+      candidate = JSON.parse(raw);
+    } catch (e) {
+      localStorage.removeItem('iw_student_logged_in');
+      return;
+    }
+
+    if (!candidate || (!candidate.email && !candidate.roll_no)) {
+      localStorage.removeItem('iw_student_logged_in');
+      return;
+    }
+
+    // Verify student STILL exists in Supabase live database
+    const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+    if (supabase && window.isSupabaseConfigured && window.isSupabaseConfigured()) {
+      const email = candidate.email;
+      const rollNo = candidate.roll_no;
       try {
-        currentStudentSession = JSON.parse(raw);
-        updateNavToLoggedIn(currentStudentSession);
-      } catch (e) {
-        currentStudentSession = null;
+        let liveRow = null;
+        let dbChecked = false;
+
+        if (email) {
+          const { data, error } = await supabase
+            .from('registrations')
+            .select('*')
+            .ilike('email', email)
+            .limit(1);
+          if (!error) {
+            dbChecked = true;
+            if (data && data.length > 0) liveRow = data[0];
+          }
+        }
+
+        if (!liveRow && rollNo) {
+          const { data, error } = await supabase
+            .from('registrations')
+            .select('*')
+            .ilike('roll_no', rollNo)
+            .limit(1);
+          if (!error) {
+            dbChecked = true;
+            if (data && data.length > 0) liveRow = data[0];
+          }
+        }
+
+        if (dbChecked && !liveRow) {
+          // RECORD WAS DELETED FROM SUPABASE BY ADMIN!
+          console.warn('[Session Verify] User record was deleted from Supabase. Revoking session & purging local data.');
+          logoutStudentSession(true);
+          return;
+        }
+
+        if (liveRow) {
+          // Record exists! Update status in session
+          currentStudentSession = liveRow;
+          localStorage.setItem('iw_student_logged_in', JSON.stringify(liveRow));
+          localStorage.setItem('internwell_student_profile', JSON.stringify(liveRow));
+          updateNavToLoggedIn(liveRow);
+
+          // If profile modal is open, re-render it
+          if (profileModal && profileModal.classList.contains('open')) {
+            renderProfileStaticData(liveRow);
+            updateProfileStatusDisplay(liveRow.status);
+            renderRoadmap(liveRow.status);
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn('[Session Verify network notice]', err);
       }
     }
+
+    // Fallback if offline
+    currentStudentSession = candidate;
+    updateNavToLoggedIn(candidate);
   }
+
+  // Real-time verification when tab is focused
+  window.addEventListener('focus', () => {
+    if (currentStudentSession) {
+      checkActiveStudentSession();
+    }
+  });
+
+  // Background polling every 20 seconds to catch admin deletions / approvals in real time
+  setInterval(() => {
+    if (currentStudentSession) {
+      checkActiveStudentSession();
+    }
+  }, 20000);
 
   window.loginStudentSession = function(profile) {
     currentStudentSession = profile;
@@ -843,9 +965,16 @@ function initStudentDashboardSystem() {
     updateNavToLoggedIn(profile);
   };
 
-  function logoutStudentSession() {
+  function logoutStudentSession(wasRevoked = false) {
+    const prev = currentStudentSession;
     currentStudentSession = null;
     localStorage.removeItem('iw_student_logged_in');
+    localStorage.removeItem('internwell_student_profile');
+
+    if (prev) {
+      purgeLocalStudentCredentials(prev.email);
+      purgeLocalStudentCredentials(prev.roll_no);
+    }
 
     const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
     if (supabase) {
@@ -858,9 +987,16 @@ function initStudentDashboardSystem() {
     window.closeStudentProfileModal();
 
     if (window.showToast) {
-      window.showToast('Logged out of Student Dashboard.');
+      if (wasRevoked) {
+        window.showToast('⚠️ Your application has been removed by the administration. Dashboard access closed.');
+      } else {
+        window.showToast('Logged out of Student Dashboard.');
+      }
     }
   }
+
+  window.logoutStudentSession = logoutStudentSession;
+  window.checkActiveStudentSession = checkActiveStudentSession;
 
   function updateNavToLoggedIn(profile) {
     if (!profile) return;
@@ -892,7 +1028,32 @@ function initStudentDashboardSystem() {
   }
 }
 
-// Local Credentials Storage Helpers
+// Global Credentials Storage & Session Purge Helpers
+function purgeLocalStudentCredentials(query) {
+  const keys = ['iw_student_logged_in', 'internwell_student_profile', 'iw_student_auth'];
+  if (!query) {
+    keys.forEach((k) => localStorage.removeItem(k));
+    return;
+  }
+  const q = String(query).trim().toLowerCase();
+  keys.forEach((k) => {
+    const raw = localStorage.getItem(k);
+    if (raw) {
+      try {
+        const obj = JSON.parse(raw);
+        const email = String(obj.email || obj.profile?.email || '').trim().toLowerCase();
+        const roll = String(obj.roll_no || obj.rollNo || obj.profile?.roll_no || '').trim().toLowerCase();
+        if (email === q || roll === q) {
+          localStorage.removeItem(k);
+        }
+      } catch (e) {
+        localStorage.removeItem(k);
+      }
+    }
+  });
+}
+window.purgeLocalStudentCredentials = purgeLocalStudentCredentials;
+
 function saveLocalCredentials(email, rollNo, password, profile) {
   const creds = {
     email: email,

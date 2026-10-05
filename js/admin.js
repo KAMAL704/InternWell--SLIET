@@ -437,7 +437,7 @@ async function initAdminDashboard() {
   if (deleteBtn) {
     deleteBtn.addEventListener('click', async () => {
       if (!currentApplicant) return;
-      const confirmDelete = confirm(`Are you sure you want to delete application for ${currentApplicant.full_name} (${currentApplicant.roll_no})? This action cannot be undone.`);
+      const confirmDelete = confirm(`Are you sure you want to delete application for ${currentApplicant.full_name} (${currentApplicant.roll_no})? This will permanently delete their record from the database and remove their student dashboard access.`);
       if (!confirmDelete) return;
 
       try {
@@ -448,10 +448,13 @@ async function initAdminDashboard() {
             .eq('id', currentApplicant.id);
 
           if (error) {
-            alert(`Failed to delete application: ${error.message}`);
+            alert(`Failed to delete application from database: ${error.message}`);
             return;
           }
         }
+
+        // Purge local student session if this applicant was logged in on this browser
+        cleanStudentLocalCache(currentApplicant.email, currentApplicant.roll_no);
 
         // Remove from in-memory list
         allRegistrations = allRegistrations.filter((r) => String(r.id) !== String(currentApplicant.id));
@@ -463,9 +466,27 @@ async function initAdminDashboard() {
         renderRegistrationsTable();
         updateStats();
         closeApplicantModal();
+        alert(`Application for ${currentApplicant.full_name} has been permanently deleted from Supabase.`);
       } catch (err) {
         console.error('[Delete Error]', err);
         alert('An unexpected error occurred while deleting.');
+      }
+    });
+  }
+
+  function cleanStudentLocalCache(email, rollNo) {
+    const keys = ['iw_student_logged_in', 'internwell_student_profile', 'iw_student_auth'];
+    keys.forEach((key) => {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        try {
+          const obj = JSON.parse(raw);
+          const e = (obj.email || obj.profile?.email || '').toLowerCase();
+          const r = (obj.roll_no || obj.rollNo || obj.profile?.roll_no || '').toLowerCase();
+          if ((email && e === email.toLowerCase()) || (rollNo && r === rollNo.toLowerCase())) {
+            localStorage.removeItem(key);
+          }
+        } catch (err) {}
       }
     });
   }
