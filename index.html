@@ -1103,6 +1103,9 @@
         </div>
       </div>
 
+      <!-- Live Announcement Banner (e.g. Induction Complete Celebration) -->
+      <div id="profile-status-banner-wrap"></div>
+
       <!-- Quick Stats / Telemetry Bar -->
       <div class="profile-telemetry-grid">
         <div class="telemetry-box">
@@ -1152,36 +1155,12 @@
 
       <!-- Live Induction Tracker Roadmap -->
       <div class="profile-section">
-        <h4 class="profile-section-title"><i class="fa-solid fa-timeline"></i> Induction Progression</h4>
-        <div class="roadmap-track">
-          <div class="roadmap-step step-done">
-            <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
-            <div class="roadmap-content">
-              <strong>1. Application Submitted</strong>
-              <span>Dossier successfully collected &amp; stored in database.</span>
-            </div>
-          </div>
-          <div class="roadmap-step step-active">
-            <div class="roadmap-dot"><i class="fa-solid fa-spinner fa-spin"></i></div>
-            <div class="roadmap-content">
-              <strong>2. Domain Screening</strong>
-              <span>Domain leads review your skill matrix &amp; portfolio.</span>
-            </div>
-          </div>
-          <div class="roadmap-step">
-            <div class="roadmap-dot"><i class="fa-solid fa-comments"></i></div>
-            <div class="roadmap-content">
-              <strong>3. Interaction &amp; Mentorship Round</strong>
-              <span>Technical interaction &amp; alignment call with club coordinators.</span>
-            </div>
-          </div>
-          <div class="roadmap-step">
-            <div class="roadmap-dot"><i class="fa-solid fa-award"></i></div>
-            <div class="roadmap-content">
-              <strong>4. Welcome to InternWell SLIET</strong>
-              <span>Onboarding to active project sprints &amp; socio-startup teams.</span>
-            </div>
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <h4 class="profile-section-title" style="margin-bottom: 0;"><i class="fa-solid fa-timeline"></i> Induction Progression</h4>
+          <span id="profile-step-counter" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--blue-light);">Stage 2 of 4</span>
+        </div>
+        <div id="profile-roadmap-track" class="roadmap-track">
+          <!-- Rendered dynamically by renderRoadmap() in registration.js -->
         </div>
       </div>
 

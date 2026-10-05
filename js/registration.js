@@ -475,6 +475,21 @@ function initStudentDashboardSystem() {
   window.openStudentProfileModal = function(profile) {
     if (!profileModal || !profile) return;
 
+    renderProfileStaticData(profile);
+    updateProfileStatusDisplay(profile.status);
+    renderRoadmap(profile.status);
+
+    profileModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    if (window.cyberAudio && typeof window.cyberAudio.playBlip === 'function') {
+      window.cyberAudio.playBlip();
+    }
+
+    // Actively query Supabase for latest status set by admin!
+    fetchLiveStudentStatus(profile);
+  };
+
+  function renderProfileStaticData(profile) {
     const initials = (profile.full_name || 'IW')
       .split(' ')
       .filter(Boolean)
@@ -491,14 +506,6 @@ function initStudentDashboardSystem() {
 
     const rollEl = document.getElementById('profile-roll-badge');
     if (rollEl) rollEl.textContent = `ROLL: ${profile.roll_no || 'N/A'}`;
-
-    const statusPill = document.getElementById('profile-status-pill');
-    if (statusPill) {
-      const status = profile.status || 'Pending';
-      const statusClass = status.toLowerCase();
-      statusPill.className = `status-pill ${statusClass}`;
-      statusPill.innerHTML = `<i class="fa-solid ${getStatusIcon(status)}"></i> ${status}`;
-    }
 
     const deptEl = document.getElementById('profile-dept-val');
     if (deptEl) deptEl.textContent = profile.department || 'N/A';
@@ -539,13 +546,237 @@ function initStudentDashboardSystem() {
         skillsContainer.innerHTML = `<span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">No specific skills recorded</span>`;
       }
     }
+  }
 
-    profileModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    if (window.cyberAudio && typeof window.cyberAudio.playBlip === 'function') {
-      window.cyberAudio.playBlip();
+  function updateProfileStatusDisplay(status) {
+    const statusPill = document.getElementById('profile-status-pill');
+    if (!statusPill) return;
+    const s = status || 'Pending';
+    const statusClass = s.toLowerCase();
+    statusPill.className = `status-pill ${statusClass}`;
+    statusPill.innerHTML = `<i class="fa-solid ${getStatusIcon(s)}"></i> ${s}`;
+  }
+
+  // Dynamic 4-Stage Induction Progression Roadmap Renderer
+  function renderRoadmap(status) {
+    const track = document.getElementById('profile-roadmap-track');
+    const counter = document.getElementById('profile-step-counter');
+    const bannerWrap = document.getElementById('profile-status-banner-wrap');
+    if (!track) return;
+
+    const s = (status || 'pending').toLowerCase();
+
+    if (s === 'completed') {
+      if (counter) counter.textContent = 'Stage 4 of 4 (Completed)';
+      if (bannerWrap) {
+        bannerWrap.innerHTML = `
+          <div class="profile-completed-banner">
+            <i class="fa-solid fa-trophy" style="font-size: 1.6rem; color: #38bdf8;"></i>
+            <div>
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 2px;">🎉 INDUCTION COMPLETE // OFFICIAL CLUB MEMBER</strong>
+              <p style="margin: 0; font-size: 0.8rem; color: #bae6fd;">Congratulations! You have completed all induction rounds and are officially inducted into InternWell SLIET.</p>
+            </div>
+          </div>
+        `;
+      }
+      track.innerHTML = `
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>1. Application Submitted</strong>
+            <span>Dossier successfully verified &amp; recorded.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>2. Domain Screening Cleared</strong>
+            <span>Your skills matrix and profile were approved by domain leads.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>3. Interaction &amp; Mentorship Cleared</strong>
+            <span>Technical discussion and club alignment completed.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot" style="background: #0284c7; border-color: #38bdf8; box-shadow: 0 0 12px rgba(56, 189, 248, 0.7);"><i class="fa-solid fa-star"></i></div>
+          <div class="roadmap-content">
+            <strong style="color: #38bdf8;">4. Welcomed to InternWell SLIET!</strong>
+            <span>Official onboarding complete. You are assigned to active project sprints!</span>
+          </div>
+        </div>
+      `;
+    } else if (s === 'approved') {
+      if (counter) counter.textContent = 'Stage 3 of 4 (Approved)';
+      if (bannerWrap) {
+        bannerWrap.innerHTML = `
+          <div class="profile-completed-banner" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4);">
+            <i class="fa-solid fa-circle-check" style="font-size: 1.5rem; color: #34d399;"></i>
+            <div>
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 2px;">APPLICATION APPROVED &amp; SHORTLISTED</strong>
+              <p style="margin: 0; font-size: 0.8rem; color: #a7f3d0;">Congratulations! You cleared domain screening. Check your email/WhatsApp for onboarding instructions.</p>
+            </div>
+          </div>
+        `;
+      }
+      track.innerHTML = `
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>1. Application Submitted</strong>
+            <span>Dossier successfully verified &amp; recorded.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>2. Domain Screening Cleared</strong>
+            <span>Approved by domain leads.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>3. Interaction Round Cleared</strong>
+            <span>Approved for club membership.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-active">
+          <div class="roadmap-dot"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          <div class="roadmap-content">
+            <strong>4. Final Welcome &amp; Onboarding</strong>
+            <span>Team credentials and project sprint assignment underway.</span>
+          </div>
+        </div>
+      `;
+    } else if (s === 'rejected') {
+      if (counter) counter.textContent = 'Review Concluded';
+      if (bannerWrap) {
+        bannerWrap.innerHTML = `
+          <div class="profile-completed-banner" style="background: rgba(239, 68, 68, 0.12); border-color: rgba(239, 68, 68, 0.35);">
+            <i class="fa-solid fa-circle-info" style="font-size: 1.5rem; color: #f87171;"></i>
+            <div>
+              <strong style="color: #fff; font-size: 0.95rem; display: block; margin-bottom: 2px;">SELECTION CYCLE CONCLUDED</strong>
+              <p style="margin: 0; font-size: 0.8rem; color: #fca5a5;">Thank you for your interest in InternWell SLIET. Due to high volume, your application was not selected this cycle. We encourage you to upskill and reapply in the next recruitment round!</p>
+            </div>
+          </div>
+        `;
+      }
+      track.innerHTML = `
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>1. Application Submitted</strong>
+            <span>Dossier received and reviewed.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>2. Profile Reviewed</strong>
+            <span>Application evaluated for the current intake.</span>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-dot" style="background: #334155; color: #94a3b8;"><i class="fa-solid fa-arrow-rotate-right"></i></div>
+          <div class="roadmap-content">
+            <strong>3. Upskill &amp; Reapply</strong>
+            <span>Practice projects, build your portfolio, and apply for our next open intake!</span>
+          </div>
+        </div>
+      `;
+    } else {
+      // Default: 'pending'
+      if (counter) counter.textContent = 'Stage 2 of 4 (In Review)';
+      if (bannerWrap) bannerWrap.innerHTML = '';
+      track.innerHTML = `
+        <div class="roadmap-step step-done">
+          <div class="roadmap-dot"><i class="fa-solid fa-check"></i></div>
+          <div class="roadmap-content">
+            <strong>1. Application Submitted</strong>
+            <span>Dossier successfully collected &amp; stored in database.</span>
+          </div>
+        </div>
+        <div class="roadmap-step step-active">
+          <div class="roadmap-dot"><i class="fa-solid fa-spinner fa-spin"></i></div>
+          <div class="roadmap-content">
+            <strong>2. Domain Screening</strong>
+            <span>Domain leads are reviewing your skill matrix &amp; portfolio.</span>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-dot"><i class="fa-solid fa-comments"></i></div>
+          <div class="roadmap-content">
+            <strong>3. Interaction &amp; Mentorship Round</strong>
+            <span>Technical interaction &amp; alignment call with club coordinators.</span>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-dot"><i class="fa-solid fa-award"></i></div>
+          <div class="roadmap-content">
+            <strong>4. Welcome to InternWell SLIET</strong>
+            <span>Onboarding to active project sprints &amp; socio-startup teams.</span>
+          </div>
+        </div>
+      `;
     }
-  };
+  }
+
+  // Actively fetch live status from Supabase so admin updates show immediately
+  async function fetchLiveStudentStatus(profile) {
+    if (!profile || (!profile.email && !profile.roll_no)) return;
+    const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+    if (!supabase || !window.isSupabaseConfigured || !window.isSupabaseConfigured()) return;
+
+    try {
+      let fresh = null;
+
+      // Query by email
+      if (profile.email) {
+        const { data, error } = await supabase
+          .from('registrations')
+          .select('*')
+          .eq('email', profile.email)
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          fresh = data[0];
+        }
+      }
+
+      // Query by roll_no if email query was empty
+      if (!fresh && profile.roll_no) {
+        const { data, error } = await supabase
+          .from('registrations')
+          .select('*')
+          .eq('roll_no', profile.roll_no)
+          .limit(1);
+
+        if (!error && data && data.length > 0) {
+          fresh = data[0];
+        }
+      }
+
+      if (fresh && fresh.status) {
+        console.log('[Live Status Sync] Received updated status from database:', fresh.status);
+        profile.status = fresh.status;
+        profile.admin_notes = fresh.admin_notes || profile.admin_notes;
+
+        // Update local session
+        localStorage.setItem('iw_student_logged_in', JSON.stringify(profile));
+        localStorage.setItem('internwell_student_profile', JSON.stringify(profile));
+
+        // Immediately update visual UI
+        updateProfileStatusDisplay(fresh.status);
+        renderRoadmap(fresh.status);
+      }
+    } catch (err) {
+      console.warn('[Live Status Sync Notice]', err);
+    }
+  }
 
   window.closeStudentProfileModal = function() {
     if (profileModal) {

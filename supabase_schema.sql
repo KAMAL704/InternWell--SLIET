@@ -80,12 +80,13 @@ WITH CHECK (
     domain_interest IS NOT NULL AND trim(domain_interest) <> ''
 );
 
--- Policy 2: Only Authenticated Users (Admins) can VIEW all registrations
+-- Policy 2: Allow query of registrations so students can track their live status and admins can manage dossiers
 DROP POLICY IF EXISTS "Admins can view registrations" ON public.registrations;
-CREATE POLICY "Admins can view registrations"
+DROP POLICY IF EXISTS "Allow select on registrations" ON public.registrations;
+CREATE POLICY "Allow select on registrations"
 ON public.registrations
 FOR SELECT
-TO authenticated
+TO anon, authenticated
 USING (true);
 
 -- Policy 3: Only Authenticated Users (Admins) can UPDATE registrations (status / notes)
