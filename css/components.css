@@ -849,3 +849,44 @@ body.intro-revealing .hero-cta-group {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   MODAL TAB SWITCHER (REGISTER VS LOGIN)
+   ========================================================================== */
+.modal-tab-switcher {
+  display: flex;
+  background: rgba(2, 6, 23, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 4px;
+  margin-bottom: 22px;
+  gap: 4px;
+}
+
+.modal-tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all var(--transition-fast);
+}
+
+.modal-tab-btn:hover {
+  color: #fff;
+}
+
+.modal-tab-btn.active {
+  background: var(--blue-primary);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+}

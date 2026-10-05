@@ -131,14 +131,14 @@
           <span id="sound-status-text">SFX: ON</span>
         </button>
 
-        <!-- Track / Look Up Application -->
-        <button id="btn-track-application-nav" class="btn-action-view" style="padding: 7px 12px; font-size: 0.8rem;" title="Check Application Status">
-          <i class="fa-solid fa-magnifying-glass"></i> <span class="nav-track-text">Track Status</span>
+        <!-- Student Login button in navbar -->
+        <button id="btn-student-login-nav" class="btn-action-view" style="padding: 7px 12px; font-size: 0.8rem;" title="Student Login to Dashboard">
+          <i class="fa-solid fa-right-to-bracket"></i> <span class="nav-login-text">Student Login</span>
         </button>
 
-        <!-- Student Profile Quick Access (shown when registered) -->
-        <button id="btn-my-profile-nav" class="btn-action-view" style="display: none; padding: 7px 12px; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.4); color: var(--blue-light);" title="View Registered Profile & Application Status">
-          <i class="fa-solid fa-id-card"></i> <span id="nav-profile-name-text">My Profile</span>
+        <!-- Student Dashboard button (shown when logged in) -->
+        <button id="btn-student-dashboard-nav" class="btn-action-view" style="display: none; padding: 7px 12px; font-size: 0.8rem; border-color: rgba(56, 189, 248, 0.5); color: var(--blue-light);" title="Open Student Dashboard">
+          <i class="fa-solid fa-id-card"></i> <span id="nav-dashboard-name-text">Dashboard</span>
         </button>
 
         <button class="btn-cyber-primary btn-open-induction nav-desktop-join-btn">
@@ -924,13 +924,23 @@
         <i class="fa-solid fa-xmark"></i>
       </button>
 
-      <div class="section-tag" style="margin-bottom: 12px;">
-        <span class="dot"></span>
-        <span>RECRUITMENT // INDUCTIONS</span>
+      <!-- Modal Tab Switcher: Register vs Login -->
+      <div class="modal-tab-switcher">
+        <button type="button" class="modal-tab-btn active" id="tab-btn-register">
+          <i class="fa-solid fa-user-plus"></i> Register
+        </button>
+        <button type="button" class="modal-tab-btn" id="tab-btn-login">
+          <i class="fa-solid fa-right-to-bracket"></i> Student Login
+        </button>
       </div>
 
-      <h3 class="modal-title">Join InternWell SLIET</h3>
-      <p class="modal-subtitle">
+      <div class="section-tag" style="margin-bottom: 12px;">
+        <span class="dot"></span>
+        <span id="modal-tag-text">RECRUITMENT // INDUCTIONS</span>
+      </div>
+
+      <h3 class="modal-title" id="modal-heading-title">Join InternWell SLIET</h3>
+      <p class="modal-subtitle" id="modal-heading-subtitle">
         Step into our socio-startup & upskilling forum. Fill out your details below to begin.
       </p>
 
@@ -1026,9 +1036,38 @@
           <textarea id="applicant-note" class="form-textarea" rows="2" placeholder="Tell us about your interests, skills, or what you're excited to learn..."></textarea>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" for="applicant-password">Create Account Password <span class="required-star">*</span></label>
+          <input type="password" id="applicant-password" class="form-input" placeholder="Create password (min. 6 characters to log into your dashboard)" required minlength="6" autocomplete="new-password">
+        </div>
+
         <button type="submit" id="induction-submit-btn" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
-          <i class="fa-solid fa-paper-plane"></i> Submit Application
+          <i class="fa-solid fa-paper-plane"></i> Submit Application &amp; Create Account
         </button>
+      </form>
+
+      <!-- STUDENT LOGIN FORM -->
+      <form id="student-login-form" style="display: none;">
+        <div id="login-status-alert" class="form-status-alert error" style="display: none;"></div>
+
+        <div class="form-group">
+          <label class="form-label" for="student-login-email">Registered Email ID / Roll No <span class="required-star">*</span></label>
+          <input type="text" id="student-login-email" class="form-input" placeholder="e.g. name.2310123@sliet.ac.in or 2310123" required autocomplete="username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="student-login-password">Password <span class="required-star">*</span></label>
+          <input type="password" id="student-login-password" class="form-input" placeholder="••••••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="student-login-btn" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
+          <i class="fa-solid fa-right-to-bracket"></i> Login to Student Dashboard
+        </button>
+
+        <div style="text-align: center; margin-top: 18px; font-size: 0.85rem; color: var(--text-secondary);">
+          New to InternWell? 
+          <a href="#" id="link-switch-to-register" style="color: var(--blue-light); text-decoration: underline; margin-left: 4px;">Submit New Application</a>
+        </div>
       </form>
     </div>
   </div>
@@ -1164,12 +1203,17 @@
 
       <!-- Footer Buttons -->
       <div class="profile-footer-actions">
-        <button id="btn-print-profile-slip" type="button" class="btn-cyber-outline">
-          <i class="fa-solid fa-print"></i> Print / Save Slip
+        <button id="btn-student-logout" type="button" class="btn-action-view" style="color: #f87171; border-color: rgba(239, 68, 68, 0.35);">
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
         </button>
-        <button id="btn-done-profile-view" type="button" class="btn-cyber-primary">
-          <i class="fa-solid fa-arrow-right"></i> Continue to Website
-        </button>
+        <div style="display: flex; gap: 10px;">
+          <button id="btn-print-profile-slip" type="button" class="btn-cyber-outline">
+            <i class="fa-solid fa-print"></i> Print Slip
+          </button>
+          <button id="btn-done-profile-view" type="button" class="btn-cyber-primary">
+            <i class="fa-solid fa-arrow-right"></i> Done
+          </button>
+        </div>
       </div>
     </div>
   </div>
