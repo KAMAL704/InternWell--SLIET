@@ -191,19 +191,7 @@ function initInductionModal() {
     });
   }
 
-  if (form) {
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('applicant-name')?.value || 'Cadet';
-
-      window.closeInductionModal();
-      triggerConfetti();
-      if (window.cyberAudio) window.cyberAudio.playSuccess();
-
-      showToast(`✨ Application Submitted! Welcome to InternWell SLIET, ${name}!`);
-      form.reset();
-    });
-  }
+  // Form submission is handled by js/registration.js with Supabase backend
 }
 
 /* ==========================================================================

@@ -920,39 +920,98 @@
       </p>
 
       <form id="induction-form">
+        <div id="form-status-alert" class="form-status-alert" style="display: none;"></div>
+
         <div class="form-group">
-          <label class="form-label" for="applicant-name">Full Name</label>
-          <input type="text" id="applicant-name" class="form-input" placeholder="e.g. Aman Sharma" required>
+          <label class="form-label" for="applicant-name">Full Name <span class="required-star">*</span></label>
+          <input type="text" id="applicant-name" class="form-input" placeholder="e.g. Aman Sharma" required autocomplete="name">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="applicant-roll">College Roll / Reg No <span class="required-star">*</span></label>
+            <input type="text" id="applicant-roll" class="form-input" placeholder="e.g. GCS-2310123" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="applicant-email">College / Personal Email <span class="required-star">*</span></label>
+            <input type="email" id="applicant-email" class="form-input" placeholder="e.g. aman.2310123@sliet.ac.in" required autocomplete="email">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="applicant-phone">Phone / WhatsApp No <span class="required-star">*</span></label>
+            <input type="tel" id="applicant-phone" class="form-input" placeholder="e.g. 9876543210" required autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="applicant-dept">Department / Branch <span class="required-star">*</span></label>
+            <select id="applicant-dept" class="form-select" required>
+              <option value="" disabled selected>Select Department</option>
+              <option value="Computer Science & Engineering (CSE)">Computer Science & Engineering (CSE)</option>
+              <option value="Electronics & Communication Engineering (ECE)">Electronics & Communication Engineering (ECE)</option>
+              <option value="Electrical & Instrumentation Engineering (EIE)">Electrical & Instrumentation Engineering (EIE)</option>
+              <option value="Mechanical Engineering (ME)">Mechanical Engineering (ME)</option>
+              <option value="Food Engineering & Technology (FET)">Food Engineering & Technology (FET)</option>
+              <option value="Chemical Engineering (CHE)">Chemical Engineering (CHE)</option>
+              <option value="Integrated Certificate-Diploma (ICD)">Integrated Certificate-Diploma (ICD)</option>
+              <option value="Sciences & Humanities">Sciences & Humanities</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="applicant-year">Year / Semester <span class="required-star">*</span></label>
+            <select id="applicant-year" class="form-select" required>
+              <option value="" disabled selected>Select Year / Semester</option>
+              <option value="1st Year (Sem 1/2)">1st Year (Sem 1/2)</option>
+              <option value="2nd Year (Sem 3/4)">2nd Year (Sem 3/4)</option>
+              <option value="3rd Year (Sem 5/6)">3rd Year (Sem 5/6)</option>
+              <option value="4th Year (Sem 7/8)">4th Year (Sem 7/8)</option>
+              <option value="Postgraduate / M.Tech / PhD">Postgraduate / M.Tech / PhD</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="applicant-domain">Primary Domain of Interest <span class="required-star">*</span></label>
+            <select id="applicant-domain" class="form-select" required>
+              <option value="" disabled selected>Select Domain of Interest</option>
+              <option value="Full-Stack Web & Mobile">Full-Stack Web & Mobile</option>
+              <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
+              <option value="Cloud & DevOps">Cloud & DevOps</option>
+              <option value="UI/UX & Product Design">UI/UX & Product Design</option>
+              <option value="Competitive Programming (DSA)">Competitive Programming (DSA)</option>
+              <option value="Event Management & PR">Event Management & PR</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="applicant-email">College Email ID / Roll No</label>
-          <input type="text" id="applicant-email" class="form-input" placeholder="e.g. 23101234@sliet.ac.in" required>
+          <label class="form-label" for="applicant-skills">Key Technical Skills & Tools</label>
+          <input type="text" id="applicant-skills" class="form-input" placeholder="e.g. JavaScript, React, Python, C++, Figma, Git">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="applicant-internship">Internship / Prior Experience</label>
+            <input type="text" id="applicant-internship" class="form-input" placeholder="e.g. Frontend Intern at XYZ / Projects">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="applicant-duration">Availability / Duration</label>
+            <input type="text" id="applicant-duration" class="form-input" placeholder="e.g. 3 Months / Immediate / Full Semester">
+          </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="applicant-domain">Primary Domain of Interest</label>
-          <select id="applicant-domain" class="form-select" required>
-            <option value="Full-Stack Web & Mobile">Full-Stack Web & Mobile</option>
-            <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
-            <option value="Cloud & DevOps">Cloud & DevOps</option>
-            <option value="UI/UX & Product Design">UI/UX & Product Design</option>
-            <option value="Competitive Programming (DSA)">Competitive Programming (DSA)</option>
-            <option value="Event Management & PR">Event Management & PR</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="applicant-links">GitHub / Portfolio / LinkedIn Profile</label>
-          <input type="url" id="applicant-links" class="form-input" placeholder="https://github.com/your-username">
+          <label class="form-label" for="applicant-links">GitHub / Portfolio / Resume Link</label>
+          <input type="url" id="applicant-links" class="form-input" placeholder="https://github.com/username or Drive resume link">
         </div>
 
         <div class="form-group">
           <label class="form-label" for="applicant-note">Why do you want to join InternWell?</label>
-          <textarea id="applicant-note" class="form-textarea" rows="3" placeholder="Tell us about your interests, skills, or what you're excited to learn..."></textarea>
+          <textarea id="applicant-note" class="form-textarea" rows="2" placeholder="Tell us about your interests, skills, or what you're excited to learn..."></textarea>
         </div>
 
-        <button type="submit" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
+        <button type="submit" id="induction-submit-btn" class="btn-cyber-primary" style="width: 100%; margin-top: 10px;">
           <i class="fa-solid fa-paper-plane"></i> Submit Application
         </button>
       </form>
@@ -1029,6 +1088,9 @@
           PING: <span id="live-ping" style="color: var(--emerald-accent);">14ms</span> | STATUS: ACTIVE
         </div>
         <div>
+          <a href="./admin.html" class="footer-admin-link" title="Authorized Administrator Portal"><i class="fa-solid fa-lock"></i> Admin Portal</a>
+        </div>
+        <div>
           &copy; 2024-2026 InternWell SLIET. Ready for GitHub Pages.
         </div>
       </div>
@@ -1039,11 +1101,16 @@
   <!-- Three.js (r128) CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
+  <!-- Supabase Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./js/supabase-config.js"></script>
+
   <!-- Project Scripts -->
   <script src="./js/stars.js"></script>
   <script src="./js/intro.js"></script>
   <script src="./js/audio.js"></script>
   <script src="./js/three-scene.js"></script>
   <script src="./js/main.js"></script>
+  <script src="./js/registration.js"></script>
 </body>
 </html>

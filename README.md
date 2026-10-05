@@ -24,8 +24,20 @@
   - **IW Talks** (Keynotes & AMAs with tech leaders at Google, Amazon, Microsoft, and SLIET alumni)
   - **CycleOne Integration** (Highlighting SLIET's IIC-funded smart campus bicycle project)
   - **Domains**: Full-Stack, AI & Data Science, Cloud/DevOps, UI/UX, Competitive Programming, Open Source.
-- **📝 Interactive Induction Application Modal**:
-  - Interactive form for students to apply with domain selection and cyber confetti confirmation.
+- **📝 Production Student Registration & Induction System**:
+  - Full data collection: Full Name, Roll No, Email, Phone, Department, Year/Semester, Domain, Skills, Internship details, Availability duration, Resume/Profile links, and Statement.
+  - Real-time client-side validation for email formats, 10-digit mobile numbers, and required fields.
+  - Serverless PostgreSQL backend powered by **Supabase** with automatic timestamps.
+  - **Duplicate prevention**: Unique constraints on both College Roll Number and Email.
+  - Real-time loading spinner with double-submission protection.
+- **🛡️ Authenticated Admin Portal (`admin.html`)**:
+  - Securely protected via Supabase Auth (JWT credentials).
+  - Live KPI stats counters: Total Applications, Pending, Approved, Rejected.
+  - Real-time search by name, roll no, email, or skill keywords.
+  - Filtering by Department and Application Status.
+  - Full dossier modal view with status updater (Pending -> Approved / Rejected / Completed).
+  - One-click **Export to CSV** for offline spreadsheet analysis.
+  - Strict Row Level Security (RLS): Public anonymous users can only submit registrations; only authenticated admins can view and modify student data.
 
 ---
 
@@ -103,6 +115,32 @@ This website uses **clean static HTML, CSS, JavaScript, and relative paths**, me
 3. Drag and drop all files and folders (`index.html`, `404.html`, `.nojekyll`, `css`, `js`, `assets`) into the upload box.
 4. Click **Commit changes**.
 5. Go to **Settings > Pages**, set Source to `main` branch and `/ (root)` folder, then hit **Save**!
+
+---
+
+## 🗄️ Backend & Database Setup (Supabase)
+
+The backend uses **Supabase** (PostgreSQL + REST API + Row Level Security), which works directly with GitHub Pages without any server or backend maintenance.
+
+### 1. Database Schema
+Execute [`supabase_schema.sql`](file:///Users/kamal/internwell%20web/supabase_schema.sql) in your Supabase SQL Editor:
+1. Open your Supabase Dashboard: [https://supabase.com/dashboard](https://supabase.com/dashboard)
+2. Select your project (e.g. `uhnkxgocnihflutwshsg`)
+3. Navigate to **SQL Editor** in the left sidebar
+4. Click **New Query**, paste the complete contents of `supabase_schema.sql`, and click **Run** (▶️)
+5. This automatically generates the `registrations` table, indexes, triggers, and Row Level Security (RLS) policies.
+
+### 2. Client Configuration
+Your Supabase credentials are configured in [`js/supabase-config.js`](file:///Users/kamal/internwell%20web/js/supabase-config.js):
+- **Project URL**: `https://uhnkxgocnihflutwshsg.supabase.co`
+- **Anon Public Key**: Configured in `js/supabase-config.js` (safe for public frontend with RLS enabled)
+
+### 3. Create Admin User
+To access the Admin Portal (`/admin.html`):
+1. In your Supabase Dashboard, go to **Authentication** > **Users**
+2. Click **Add User** > **Create User**
+3. Enter your admin email and secure password
+4. You can now log into `/admin.html` with this account to view registrations, change applicant statuses, and export data to CSV.
 
 ---
 
